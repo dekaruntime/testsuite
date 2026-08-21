@@ -127,11 +127,23 @@ add('basics', 'modulo_operator', {
 })
 
 add('basics', 'null_literal', {
-  status: 'pass',
+  status: 'fail',
+  stage: 'parse',
+  expectedDiagnosticContains: 'Null literals are not allowed in DekaScript',
   source: `const x = null
 console.log(x)
 `,
-  title: 'Null literal',
+  title: 'Null literal is rejected',
+})
+
+add('basics', 'undefined_literal_fail', {
+  status: 'fail',
+  stage: 'parse',
+  expectedDiagnosticContains: 'undefined',
+  source: `const x = undefined
+console.log(x)
+`,
+  title: 'Undefined pseudo-literal is rejected',
 })
 
 add('basics', 'string_escape', {
