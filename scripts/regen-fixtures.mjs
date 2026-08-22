@@ -82,7 +82,7 @@ for (const category of loadAllTests()) {
         source,
         test.entryPath,
         test.files,
-        { dekaJson: test.dekaJson }
+        { dekaJson: test.dekaJson, packages: test.packages }
       )
       if (!runResult.ok) {
         console.log(`[regen] ${test.slug}: PASS test failed at runtime: ${runResult.error}`)

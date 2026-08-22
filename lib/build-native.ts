@@ -18,6 +18,17 @@ const DEFAULT_DEKA_JSON = {
   },
 }
 
+const PACKAGE_DEKA_JSON = {
+  name: 'conformance-fixture',
+  security: {
+    allow: {
+      read: ['./'],
+      write: ['.cache', 'php_modules'],
+    },
+    prompt: false,
+  },
+}
+
 export interface NativeRunResult {
   ok: boolean
   stdout: string
@@ -190,21 +201,88 @@ function writeProjectFiles(tmpDir: string, entryPath: string, source: string, fi
   return { inputPath: tmpDir, outputPath, isProject: true }
 }
 
+function installPackages(
+  cliPath: string,
+  tmpDir: string,
+  packages: string[]
+): { ok: boolean; error?: string; stderr: string } {
+  const cacheKey = packages.slice().sort().join('+')
+  const cacheDir = path.join(process.cwd(), '.cache', 'deka-packages', cacheKey)
+  const cachedLock = path.join(cacheDir, 'deka.lock')
+  const cachedModules = path.join(cacheDir, 'php_modules')
+
+  if (fs.existsSync(cachedLock) && fs.existsSync(cachedModules)) {
+    fs.cpSync(cachedModules, path.join(tmpDir, 'php_modules'), { recursive: true })
+    fs.copyFileSync(cachedLock, path.join(tmpDir, 'deka.lock'))
+    return { ok: true, stderr: '' }
+  }
+
+  const spawned = spawnSync(cliPath, ['add', ...packages, '--yes'], {
+    cwd: tmpDir,
+    encoding: 'utf-8',
+    timeout: 120000,
+    env: { ...process.env, DEKA_SECURITY_NO_PROMPT: '1' },
+  })
+  const stderr = spawned.stderr ?? ''
+  if (spawned.status !== 0 || spawned.error) {
+    return {
+      ok: false,
+      error:
+        spawned.error?.message ??
+        stderr
+          .split('\n')
+          .map((line) => line.trim())
+          .find((line) => line.length > 0) ??
+        `deka add ${packages.join(' ')} failed`,
+      stderr,
+    }
+  }
+
+  fs.mkdirSync(cacheDir, { recursive: true })
+  const modulesDir = path.join(tmpDir, 'php_modules')
+  if (fs.existsSync(modulesDir)) {
+    fs.cpSync(modulesDir, cachedModules, { recursive: true })
+  }
+  const lockPath = path.join(tmpDir, 'deka.lock')
+  if (fs.existsSync(lockPath)) {
+    fs.copyFileSync(lockPath, cachedLock)
+  }
+  return { ok: true, stderr }
+}
+
 export async function runNativeCli(
   cliPath: string,
   source: string,
   entryPath?: string,
   files?: Record<string, string>,
-  options?: { dekaJson?: Record<string, unknown> }
+  options?: { dekaJson?: Record<string, unknown>; packages?: string[] }
 ): Promise<NativeRunResult> {
   const tmpDir = createPrivateTempDir()
+  const packages = options?.packages ?? []
 
   try {
     const { isProject } = writeProjectFiles(tmpDir, entryPath ?? 'test.ds', source, files)
 
     fs.writeFileSync(path.join(tmpDir, 'deka.lock'), DEFAULT_DEKA_LOCK)
-    const dekaJson = options?.dekaJson ?? DEFAULT_DEKA_JSON
+    const dekaJson =
+      options?.dekaJson ?? (packages.length > 0 ? PACKAGE_DEKA_JSON : DEFAULT_DEKA_JSON)
     fs.writeFileSync(path.join(tmpDir, 'deka.json'), JSON.stringify(dekaJson, null, 2) + '\n')
+
+    if (packages.length > 0) {
+      const installed = installPackages(cliPath, tmpDir, packages)
+      if (!installed.ok) {
+        return {
+          ok: false,
+          stdout: '',
+          stderr: installed.stderr,
+          error: installed.error,
+          transpileFailed: true,
+          diagnostics: installed.error
+            ? [{ severity: 'error', message: installed.error }]
+            : [],
+        }
+      }
+    }
 
     const entryRel = isProject ? `./${entryPath ?? 'main.ds'}` : './test.ds'
 
