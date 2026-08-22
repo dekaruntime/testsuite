@@ -40,10 +40,16 @@ The suite uses exact string comparison for both stdout and formatted code. Every
 {
   "title": "Missing semicolon between struct fields",
   "stage": "parse",
+  "hosts": ["native", "browser"],
   "expectedDiagnosticContains": "expected ';'",
   "notes": "Regression for formatter/tour corruption."
 }
 ```
+
+Optional JSON fields:
+
+- `hosts` — `["native","browser"]` (default), or a single host for APIs that only exist there.
+- `dekaJson` — security manifest copied next to the entry for `deka run`.
 
 Fields:
 
@@ -79,21 +85,37 @@ Dump the full build-time conformance report locally:
 bun scripts/dump-results.mjs
 ```
 
-Generate/regenerate the snapshot-style test fixtures from the definitions in `scripts/generate-tests.mjs`:
+Regenerate `.stdout` / `.code` / diagnostics from the loaded `tests/` tree (uses the native isolate for pass stdout, not Node):
 
 ```bash
-bun scripts/generate-tests.mjs
+bun scripts/regen-fixtures.mjs
+bun scripts/regen-fixtures.mjs types
 ```
 
-## Native-vs-wasm drift detection
+## Native vs browser hosts
 
-The site compares the wasm compiler against the matching native CLI downloaded from `releases.deka.gg`. The build runs on our self-hosted `bugsy` runner (macOS ARM64), so the native CLI executes in the same environment and full wasm/native drift detection is enabled. Only tests where wasm and native genuinely disagree are shown as divergent (pink).
+Each fixture is a DekaScript program. The dump runs it on **Deka**, not on Node.
 
-Current suite snapshot (runtime v0.24.3):
+| Column | Compile | Execute |
+|---|---|---|
+| Native | CLI isolate | `deka run ./entry.ds` |
+| Browser | WASM compiler | Chromium Worker (same sandbox as the tour) |
 
-- 561 tests across 13 categories
-- 201 expected-pass fixtures
-- 360 expected-fail fixtures
+Pink / divergent means those two Deka hosts disagreed. A fixture can opt into one host via `"hosts": ["native"]` or `["browser"]` in its `.json`.
+
+The grid on the site is dump-time, not live. Open a case to tinker in the browser. Cases that cannot run in the visitor's browser — `"hosts": ["native"]`, or anything listed in `lib/recorded-only.ts` — are read-only and labeled **CACHED RESULTS** (stdout + emitted JS from the last dump). That label means the page is a recording, not frozen or broken.
+
+The dump downloads the published CLI and WASM matching `wasm.deka.gg/latest`, unless you point both at the same unreleased build:
+
+```bash
+DEKA_NATIVE=../deka/target/release/cli \
+DEKA_WASM=../deka/target/wasm32-unknown-unknown/release/deka_compiler_wasm.wasm \
+  bun scripts/dump-results.mjs
+```
+
+Dump and CI run on a self-hosted builder that can execute the native CLI and launch Chromium. GitHub-hosted Linux is not a substitute.
+
+See [RFD 26](https://github.com/dekaruntime/rfd/issues/26).
 
 ## Deployment
 

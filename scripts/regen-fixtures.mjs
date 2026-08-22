@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { loadWasmCompiler, compileWithWasm, formatDsWithWasm } from '../lib/build-wasm.ts'
-import { runJsInNode } from '../lib/run-js.ts'
+import { prepareNativeCli, runNativeCli } from '../lib/build-native.ts'
 import { loadAllTests } from '../lib/tests.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -16,6 +16,9 @@ function slugMatches(slug) {
 }
 
 const compiler = await loadWasmCompiler()
+const wasmManifest = await (await fetch('https://wasm.deka.gg/latest/deka-compiler-artifact.json')).json()
+const nativeCliPath = await prepareNativeCli(wasmManifest.compiler.version)
+const skipped = []
 
 function readJson(testDir, name) {
   const p = path.join(testDir, `${name}.json`)
@@ -37,11 +40,20 @@ for (const category of loadAllTests()) {
 
     const testDir = path.join(testsDir, test.category, test.name)
     const baseName = test.name
-    const ext = test.status === 'pass' ? 'pass.ds' : 'fail.ds'
-    const sourcePath = path.join(testDir, `${baseName}.${ext}`)
-    const source = fs.readFileSync(sourcePath, 'utf-8')
 
-    const compileResult = compileWithWasm(compiler, source, `${baseName}.ds`)
+    // Use the entry the loader already resolved. Multi-file tests (the whole
+    // `modules` category) have an entry named main.pass.ds rather than
+    // <dirname>.pass.ds. Constructing the filename from the directory name
+    // used to throw there, so every category sorting after `modules`
+    // (parser, types, unsafe, ...) was silently never regenerated.
+    const source = test.source
+    if (source === undefined) {
+      console.log(`[regen] ${test.slug}: SKIPPED, no source on loaded test`)
+      skipped.push(test.slug)
+      continue
+    }
+
+    const compileResult = compileWithWasm(compiler, source, test.entryPath ?? `${baseName}.ds`)
     const formatResult = formatDsWithWasm(compiler, source)
 
     const meta = readJson(testDir, baseName)
@@ -57,7 +69,21 @@ for (const category of loadAllTests()) {
         writeJson(testDir, baseName, meta)
         continue
       }
-      const runResult = runJsInNode(compileResult.js)
+
+      if (!nativeCliPath) {
+        console.log(`[regen] ${test.slug}: SKIPPED runtime snapshot, native CLI unavailable`)
+        skipped.push(test.slug)
+        writeJson(testDir, baseName, meta)
+        continue
+      }
+
+      const runResult = await runNativeCli(
+        nativeCliPath,
+        source,
+        test.entryPath,
+        test.files,
+        { dekaJson: test.dekaJson }
+      )
       if (!runResult.ok) {
         console.log(`[regen] ${test.slug}: PASS test failed at runtime: ${runResult.error}`)
         meta.stage = 'run'
@@ -76,7 +102,6 @@ for (const category of loadAllTests()) {
       meta.stage = 'run'
       console.log(`[regen] ${test.slug}: stdout+code updated`)
     } else {
-      // Fail test: capture the first error diagnostic.
       const firstError = compileResult.diagnostics.find((d) => d.severity === 'error')
       if (firstError) {
         meta.expectedDiagnosticContains = firstError.message
@@ -90,4 +115,8 @@ for (const category of loadAllTests()) {
 
     writeJson(testDir, baseName, meta)
   }
+}
+
+if (skipped.length > 0) {
+  console.log(`\n[regen] ${skipped.length} test(s) skipped: ${skipped.join(', ')}`)
 }

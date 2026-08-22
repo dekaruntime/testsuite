@@ -2,9 +2,14 @@ import fs from 'fs'
 import path from 'path'
 import { loadWasmCompiler, compileWithWasm, formatDsWithWasm } from './build-wasm'
 import { prepareNativeCli, runNativeCli } from './build-native'
-import { runJsInNode } from './run-js'
-import { runDekaProject, setCompilerArtifactPath } from '@dekaruntime/web-ide-kit/runtime'
-import { loadAllTests, type HatsCategory, type HatsTest, type HatsTestStage } from './tests'
+import {
+  closeBrowserHost,
+  prepareBrowserHost,
+  runCompiledJsInBrowser,
+  runProjectInBrowser,
+} from './run-browser'
+import { setCompilerArtifactPath } from '@dekaruntime/web-ide-kit/runtime'
+import { loadAllTests, type HatsCategory, type HatsHost, type HatsTest, type HatsTestStage } from './tests'
 
 export type RuntimeStatus = 'pass' | 'fail'
 
@@ -14,7 +19,10 @@ export interface RuntimeResult {
   stdout: string
   stderr: string
   formattedCode?: string
+  emittedJs?: string
   error?: string
+  skipped?: boolean
+  skipReason?: string
   diagnostics: Array<{
     severity: 'error' | 'warning' | 'info'
     message: string
@@ -52,16 +60,29 @@ function exactMatch(actual: string, expected: string): boolean {
   return actual === expected
 }
 
+function expectedStdoutForHost(test: HatsTest, host: HatsHost): string | undefined {
+  if (host === 'native' && test.expectedStdoutNative !== undefined) {
+    return test.expectedStdoutNative
+  }
+  if (host === 'browser' && test.expectedStdoutBrowser !== undefined) {
+    return test.expectedStdoutBrowser
+  }
+  return test.expectedStdout
+}
+
 function runtimeMatchesExpectation(
   test: HatsTest,
   result: RuntimeResult,
+  host: HatsHost,
   options: { ignoreCode?: boolean } = {}
 ): boolean {
+  if (result.skipped) return false
   if ((result.ok ? 'pass' : 'fail') !== test.status) return false
   if (result.stage !== test.stage) return false
 
-  if (test.expectedStdout !== undefined) {
-    if (!exactMatch(result.stdout, test.expectedStdout)) return false
+  const expectedStdout = expectedStdoutForHost(test, host)
+  if (expectedStdout !== undefined) {
+    if (!exactMatch(result.stdout, expectedStdout)) return false
   }
 
   if (!options.ignoreCode && test.expectedCode !== undefined) {
@@ -78,74 +99,56 @@ function runtimeMatchesExpectation(
   return true
 }
 
-async function runWasmTest(
+function skippedResult(reason: string): RuntimeResult {
+  return {
+    ok: false,
+    stage: 'run',
+    stdout: '',
+    stderr: '',
+    skipped: true,
+    skipReason: reason,
+    diagnostics: [],
+  }
+}
+
+async function runBrowserTest(
   source: string,
   slug: string,
   files?: Record<string, string>,
   entryPath?: string
 ): Promise<RuntimeResult> {
-  const isProject = files && entryPath
+  const formatResult = formatDsWithWasm(globalHatsCompiler, source)
+  const formattedCode = formatResult.ok ? formatResult.code : undefined
+  const isProject = Boolean(files && entryPath)
 
   if (isProject) {
-    const projectFiles = { [entryPath]: source, ...files }
-    const runResult = await runDekaProject(entryPath, projectFiles)
-    const compileResult = runResult.compileResult
-    const formatResult = formatDsWithWasm(globalHatsCompiler, source)
-
-    if (!compileResult.ok) {
-      return {
-        ok: false,
-        stage: determineStage(false, undefined, compileResult.diagnostics.find((d) => d.severity === 'error')?.message, compileResult.diagnostics),
-        stdout: '',
-        stderr: '',
-        formattedCode: formatResult.ok ? formatResult.code : undefined,
-        error: compileResult.diagnostics.find((d) => d.severity === 'error')?.message,
-        diagnostics: compileResult.diagnostics,
-      }
-    }
-
-    const diagnostics = compileResult.diagnostics.slice()
-    if (!runResult.ok && runResult.error) {
-      diagnostics.push({ severity: 'error', message: runResult.error })
-    }
-    return {
-      ok: runResult.ok,
-      stage: 'run',
-      stdout: runResult.stdout,
-      stderr: runResult.stderr,
-      formattedCode: formatResult.ok ? formatResult.code : undefined,
-      error: runResult.error,
-      diagnostics,
-    }
+    const projectFiles = { [entryPath!]: source, ...files }
+    const runResult = await runProjectInBrowser(entryPath!, projectFiles)
+    return { ...runResult, formattedCode }
   }
 
   const compileResult = compileWithWasm(globalHatsCompiler, source, `${slug}.ds`)
-  const formatResult = formatDsWithWasm(globalHatsCompiler, source)
-
   if (!compileResult.ok || !compileResult.js) {
     return {
       ok: false,
       stage: determineStage(false, compileResult.js, compileResult.error, compileResult.diagnostics),
       stdout: '',
       stderr: '',
-      formattedCode: formatResult.ok ? formatResult.code : undefined,
+      formattedCode,
       error: compileResult.error,
       diagnostics: compileResult.diagnostics,
     }
   }
 
-  const runResult = runJsInNode(compileResult.js)
+  const runResult = await runCompiledJsInBrowser(compileResult.js)
   const diagnostics = compileResult.diagnostics.slice()
   if (!runResult.ok && runResult.error) {
     diagnostics.push({ severity: 'error', message: runResult.error })
   }
   return {
-    ok: runResult.ok,
-    stage: 'run',
-    stdout: runResult.stdout,
-    stderr: runResult.stderr,
-    formattedCode: formatResult.ok ? formatResult.code : undefined,
-    error: runResult.error,
+    ...runResult,
+    formattedCode,
+    emittedJs: compileResult.js,
     diagnostics,
   }
 }
@@ -153,16 +156,16 @@ async function runWasmTest(
 async function runNativeTest(
   cliPath: string,
   source: string,
-  slug: string,
   files?: Record<string, string>,
-  entryPath?: string
+  entryPath?: string,
+  dekaJson?: Record<string, unknown>
 ): Promise<RuntimeResult> {
-  const nativeResult = await runNativeCli(cliPath, source, entryPath, files)
-
-  // Native transpile does not expose per-stage diagnostics the same way as wasm.
-  // If transpilation produced emitted JS, any remaining failure is a runtime
-  // failure. If transpilation itself failed, the error is a parse/type error.
-  const stage: HatsTestStage = nativeResult.transpileFailed ? 'parse' : 'run'
+  const nativeResult = await runNativeCli(cliPath, source, entryPath, files, { dekaJson })
+  const stage: HatsTestStage = nativeResult.ok
+    ? 'run'
+    : nativeResult.transpileFailed
+      ? 'parse'
+      : 'run'
 
   return {
     ok: nativeResult.ok,
@@ -170,31 +173,31 @@ async function runNativeTest(
     stdout: nativeResult.stdout,
     stderr: nativeResult.stderr,
     error: nativeResult.error,
+    emittedJs: nativeResult.emittedJs,
     diagnostics: nativeResult.diagnostics,
   }
 }
 
-function computeOverallStatus(
-  wasmMatches: boolean,
-  nativeMatches: boolean,
+function computeOverallStatus(args: {
+  wantNative: boolean
+  wantBrowser: boolean
   nativeAvailable: boolean
-): 'pass' | 'fail' | 'divergent' {
-  if (!nativeAvailable) {
-    return wasmMatches ? 'pass' : 'fail'
-  }
-  if (wasmMatches && nativeMatches) return 'pass'
-  if (!wasmMatches && !nativeMatches) return 'fail'
-  return 'divergent'
-}
+  browserAvailable: boolean
+  nativeMatches: boolean
+  browserMatches: boolean
+  nativeSkipped: boolean
+  browserSkipped: boolean
+}): 'pass' | 'fail' | 'divergent' {
+  const nativeRan = args.wantNative && args.nativeAvailable && !args.nativeSkipped
+  const browserRan = args.wantBrowser && args.browserAvailable && !args.browserSkipped
 
-function emptyNativeResult(): RuntimeResult {
-  return {
-    ok: false,
-    stage: 'parse',
-    stdout: '',
-    stderr: '',
-    diagnostics: [],
-  }
+  if (!nativeRan && !browserRan) return 'fail'
+
+  const nativeOk = !nativeRan || args.nativeMatches
+  const browserOk = !browserRan || args.browserMatches
+  if (nativeOk && browserOk) return 'pass'
+  if (nativeRan && browserRan && args.nativeMatches !== args.browserMatches) return 'divergent'
+  return 'fail'
 }
 
 let globalHatsCompiler: Awaited<ReturnType<typeof loadWasmCompiler>>
@@ -202,6 +205,7 @@ let loadAndRunPromise: Promise<HatsBuildResults> | null = null
 
 export interface HatsBuildResults {
   nativeAvailable: boolean
+  browserAvailable: boolean
   version: string
   categories: HatsCategoryWithResults[]
 }
@@ -217,36 +221,78 @@ async function runAllTestsOnce(): Promise<HatsBuildResults> {
   const version = wasmManifest.compiler.version
   console.log(`[hats build] wasm compiler version=${version}`)
   const nativeCliPath = await prepareNativeCli(version)
+  const nativeAvailable = nativeCliPath !== null
+  const browserAvailable = await prepareBrowserHost()
+  console.log(`[hats build] nativeAvailable=${nativeAvailable} browserAvailable=${browserAvailable}`)
 
   const categories = loadAllTests()
-
   const results: HatsCategoryWithResults[] = []
-  const nativeAvailable = nativeCliPath !== null
 
-  for (const category of categories) {
-    const tests: HatsTestWithBuildResult[] = []
-    for (const test of category.tests) {
-      const wasmResult = await runWasmTest(test.source, test.slug, test.files, test.entryPath)
-      const nativeResult = nativeCliPath
-        ? await runNativeTest(nativeCliPath, test.source, test.slug, test.files, test.entryPath)
-        : emptyNativeResult()
+  try {
+    for (const category of categories) {
+      const tests: HatsTestWithBuildResult[] = []
+      const filter = process.env.HATS_FILTER
+      for (const test of category.tests) {
+        if (filter && !test.slug.includes(filter)) continue
+        const wantNative = test.hosts.includes('native')
+        const wantBrowser = test.hosts.includes('browser')
 
-      const wasmMatches = runtimeMatchesExpectation(test, wasmResult)
-      const nativeMatches = runtimeMatchesExpectation(test, nativeResult, { ignoreCode: true })
+        const wasmResult =
+          wantBrowser && browserAvailable
+            ? await runBrowserTest(test.source, test.slug, test.files, test.entryPath)
+            : skippedResult(
+                !wantBrowser
+                  ? 'fixture is not a browser host test'
+                  : 'browser host unavailable'
+              )
 
-      tests.push({
-        ...test,
-        wasmResult,
-        nativeResult,
-        wasmMatches,
-        nativeMatches,
-        overallStatus: computeOverallStatus(wasmMatches, nativeMatches, nativeAvailable),
-      })
+        const nativeResult =
+          wantNative && nativeCliPath
+            ? await runNativeTest(
+                nativeCliPath,
+                test.source,
+                test.files,
+                test.entryPath,
+                test.dekaJson
+              )
+            : skippedResult(
+                !wantNative
+                  ? 'fixture is not a native host test'
+                  : 'native CLI unavailable'
+              )
+
+        const wasmMatches =
+          !wasmResult.skipped &&
+          runtimeMatchesExpectation(test, wasmResult, 'browser')
+        const nativeMatches =
+          !nativeResult.skipped &&
+          runtimeMatchesExpectation(test, nativeResult, 'native', { ignoreCode: true })
+
+        tests.push({
+          ...test,
+          wasmResult,
+          nativeResult,
+          wasmMatches,
+          nativeMatches,
+          overallStatus: computeOverallStatus({
+            wantNative,
+            wantBrowser,
+            nativeAvailable,
+            browserAvailable,
+            nativeMatches,
+            browserMatches: wasmMatches,
+            nativeSkipped: Boolean(nativeResult.skipped),
+            browserSkipped: Boolean(wasmResult.skipped),
+          }),
+        })
+      }
+      results.push({ ...category, tests })
     }
-    results.push({ ...category, tests })
+  } finally {
+    await closeBrowserHost()
   }
 
-  return { nativeAvailable, version, categories: results }
+  return { nativeAvailable, browserAvailable, version, categories: results }
 }
 
 export async function loadAndRunAllTests(): Promise<HatsBuildResults> {
@@ -265,7 +311,12 @@ export async function loadBuildResults(): Promise<HatsBuildResults> {
   const resultsPath = path.join(process.cwd(), 'public', 'hats-results.json')
   if (fs.existsSync(resultsPath)) {
     const raw = JSON.parse(fs.readFileSync(resultsPath, 'utf-8'))
-    return { nativeAvailable: raw.nativeAvailable, version: raw.version ?? 'unknown', categories: raw.categories }
+    return {
+      nativeAvailable: Boolean(raw.nativeAvailable),
+      browserAvailable: raw.browserAvailable !== false,
+      version: raw.version ?? 'unknown',
+      categories: raw.categories,
+    }
   }
   return loadAndRunAllTests()
 }

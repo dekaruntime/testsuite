@@ -35,8 +35,11 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      # Build runs the conformance suite against both wasm and the native CLI,
-      # so the deployed site includes native/wasm drift detection.
+      - name: Install Chromium for the browser host
+        run: bunx playwright install chromium
+
+      # Build runs the conformance suite against the native isolate (`deka run`)
+      # and a real browser Worker, so the deployed site includes host drift.
       - name: Build site
         run: bun run build
 

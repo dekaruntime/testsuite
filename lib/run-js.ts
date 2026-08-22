@@ -11,13 +11,10 @@ export interface NodeRunResult {
 }
 
 /**
- * Execute emitted DekaScript JS in a fresh Node process.
+ * @deprecated Not the conformance oracle.
  *
- * Both the native CLI and the wasm compiler emit self-contained JS with the
- * deka runtime prelude installed. Running it under Node matches how end users
- * run the native CLI, and gives the wasm compiler a fair baseline for drift
- * detection (both compilers target the same JS runtime, so differences are
- * compiler differences, not JS engine differences).
+ * Conformance execution is `deka run` (native isolate) and a Chromium Worker
+ * (browser host). This helper remains only for ad-hoc debugging of emitted JS.
  */
 export function runJsInNode(jsCode: string): NodeRunResult {
   const tmpDir = fs.mkdtempSync(path.join(tmpdir(), 'hats-node-run-'))

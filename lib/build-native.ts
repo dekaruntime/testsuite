@@ -1,10 +1,22 @@
 import fs from 'fs'
 import path from 'path'
-import { execSync } from 'child_process'
+import { execSync, spawnSync } from 'child_process'
 import os from 'os'
-import { runJsInNode } from './run-js'
 
 const RELEASES_BASE = 'https://releases.deka.gg'
+
+const DEFAULT_DEKA_LOCK = '{\n  "lockfileVersion": 1,\n  "packages": {}\n}\n'
+
+const DEFAULT_DEKA_JSON = {
+  name: 'conformance-fixture',
+  security: {
+    allow: {
+      read: ['./'],
+      write: ['.cache'],
+    },
+    prompt: false,
+  },
+}
 
 export interface NativeRunResult {
   ok: boolean
@@ -12,6 +24,7 @@ export interface NativeRunResult {
   stderr: string
   error?: string
   transpileFailed: boolean
+  emittedJs?: string
   diagnostics: Array<{
     severity: 'error' | 'warning' | 'info'
     message: string
@@ -33,6 +46,23 @@ function getPlatformBinaryName(): string | null {
 
 export async function prepareNativeCli(version: string): Promise<string | null> {
   if (nativeCliPath) return nativeCliPath
+
+  // CI uses the published CLI. Local / branch validation must be able to point
+  // both hosts at the same unreleased build (pair with DEKA_WASM):
+  //   DEKA_NATIVE=../deka/target/release/cli \
+  //   DEKA_WASM=../deka/target/wasm32-unknown-unknown/release/deka_compiler_wasm.wasm \
+  //     bun scripts/dump-results.mjs
+  const localNative = process.env.DEKA_NATIVE
+  if (localNative) {
+    const resolved = path.resolve(localNative)
+    if (!fs.existsSync(resolved)) {
+      throw new Error(`DEKA_NATIVE is set to ${resolved} but that file does not exist`)
+    }
+    fs.chmodSync(resolved, 0o755)
+    console.log(`[hats] using local native CLI: ${resolved}`)
+    nativeCliPath = resolved
+    return nativeCliPath
+  }
 
   const binaryName = getPlatformBinaryName()
   if (!binaryName) {
@@ -157,12 +187,6 @@ function writeProjectFiles(tmpDir: string, entryPath: string, source: string, fi
     fs.writeFileSync(fullPath, content)
   }
 
-  const entryBase = path.basename(entryPath)
-  const isNamedEntry = ['main.ds', 'index.ds', 'app.ds'].includes(entryBase)
-  if (!isNamedEntry) {
-    fs.writeFileSync(path.join(tmpDir, 'main.ds'), source)
-  }
-
   return { inputPath: tmpDir, outputPath, isProject: true }
 }
 
@@ -170,57 +194,65 @@ export async function runNativeCli(
   cliPath: string,
   source: string,
   entryPath?: string,
-  files?: Record<string, string>
+  files?: Record<string, string>,
+  options?: { dekaJson?: Record<string, unknown> }
 ): Promise<NativeRunResult> {
   const tmpDir = createPrivateTempDir()
 
   try {
-    const { inputPath, outputPath, isProject } = writeProjectFiles(tmpDir, entryPath ?? 'test.ds', source, files)
+    const { isProject } = writeProjectFiles(tmpDir, entryPath ?? 'test.ds', source, files)
 
-    // Ensure bun/node treat the emitted JS as an ES module, matching how wasm runs it.
-    fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({ type: 'module' }))
+    fs.writeFileSync(path.join(tmpDir, 'deka.lock'), DEFAULT_DEKA_LOCK)
+    const dekaJson = options?.dekaJson ?? DEFAULT_DEKA_JSON
+    fs.writeFileSync(path.join(tmpDir, 'deka.json'), JSON.stringify(dekaJson, null, 2) + '\n')
 
-    let transpileOk = false
-    let transpileError = ''
+    const entryRel = isProject ? `./${entryPath ?? 'main.ds'}` : './test.ds'
 
-    try {
-      const command = isProject
-        ? `"${cliPath}" transpile "${inputPath}" --bundle --out "${outputPath}"`
-        : `"${cliPath}" transpile "${inputPath}" --out "${outputPath}"`
-      execSync(command, {
-        cwd: tmpDir,
-        encoding: 'utf-8',
-        timeout: 30000,
-        stdio: ['ignore', 'pipe', 'pipe'],
-      })
-      transpileOk = true
-    } catch (err) {
-      transpileError = String((err as { stderr?: string; stdout?: string }).stderr ?? '')
-    }
+    const jsOut = path.join(tmpDir, 'captured.js')
+    const transpiled = spawnSync(cliPath, ['transpile', entryRel, '--out', jsOut], {
+      cwd: tmpDir,
+      encoding: 'utf-8',
+      timeout: 30000,
+      env: { ...process.env, DEKA_SECURITY_NO_PROMPT: '1' },
+    })
+    const emittedJs =
+      transpiled.status === 0 && fs.existsSync(jsOut)
+        ? fs.readFileSync(jsOut, 'utf-8')
+        : undefined
 
-    if (!transpileOk || !fs.existsSync(outputPath)) {
-      const diagnostics = parseNativeDiagnostics(transpileError)
-      const firstError = diagnostics[0]?.message ?? transpileError.split('\n').find((l) => l.trim()) ?? 'native transpile failed'
-      return {
-        ok: false,
-        stdout: '',
-        stderr: transpileError,
-        error: firstError,
-        transpileFailed: true,
-        diagnostics,
-      }
-    }
+    const spawned = spawnSync(cliPath, ['run', entryRel], {
+      cwd: tmpDir,
+      encoding: 'utf-8',
+      timeout: 30000,
+      env: { ...process.env, DEKA_SECURITY_NO_PROMPT: '1' },
+    })
 
-    const jsCode = fs.readFileSync(outputPath, 'utf-8')
-    const runResult = runJsInNode(jsCode)
+    const stdout = spawned.stdout ?? ''
+    const rawStderr = spawned.stderr ?? ''
+    const stderr = rawStderr
+      .split('\n')
+      .filter((line) => !line.startsWith('[security]'))
+      .join('\n')
+    const failed = spawned.status !== 0 || spawned.error !== undefined
+    const ranInIsolate = rawStderr.includes('Run failed:') || stdout.length > 0
+    const diagnostics = failed ? parseNativeDiagnostics(stderr || rawStderr) : []
+    const firstError =
+      diagnostics[0]?.message ??
+      stderr
+        .split('\n')
+        .map((line) => line.trim())
+        .find((line) => line.length > 0) ??
+      spawned.error?.message ??
+      (failed ? 'deka run failed' : undefined)
 
     return {
-      ok: runResult.ok,
-      stdout: runResult.stdout,
-      stderr: runResult.stderr,
-      error: runResult.error,
-      transpileFailed: false,
-      diagnostics: runResult.error ? [{ severity: 'error', message: runResult.error }] : [],
+      ok: !failed,
+      stdout,
+      stderr,
+      error: failed ? firstError : undefined,
+      transpileFailed: failed && !ranInIsolate,
+      emittedJs,
+      diagnostics,
     }
   } finally {
     removeTempDir(tmpDir)

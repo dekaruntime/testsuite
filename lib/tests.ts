@@ -5,6 +5,8 @@ export type HatsTestStatus = 'pass' | 'fail'
 
 export type HatsTestStage = 'parse' | 'typecheck' | 'run'
 
+export type HatsHost = 'native' | 'browser'
+
 export interface HatsTest {
   slug: string
   category: string
@@ -15,9 +17,13 @@ export interface HatsTest {
   entryPath?: string
   title: string
   stage: HatsTestStage
+  hosts: HatsHost[]
   expectedStdout?: string
+  expectedStdoutNative?: string
+  expectedStdoutBrowser?: string
   expectedCode?: string
   expectedDiagnosticContains?: string
+  dekaJson?: Record<string, unknown>
   notes?: string
 }
 
@@ -62,6 +68,12 @@ function collectDsFiles(dir: string, relativeTo: string): string[] {
   return results
 }
 
+function parseHosts(raw: unknown): HatsHost[] {
+  if (!Array.isArray(raw)) return ['native', 'browser']
+  const hosts = raw.filter((item): item is HatsHost => item === 'native' || item === 'browser')
+  return hosts.length > 0 ? hosts : ['native', 'browser']
+}
+
 function readMetadata(dir: string, name: string): Partial<HatsTest> {
   const jsonPath = path.join(dir, `${name}.json`)
   if (!fs.existsSync(jsonPath)) return {}
@@ -70,9 +82,18 @@ function readMetadata(dir: string, name: string): Partial<HatsTest> {
     return {
       title: typeof raw.title === 'string' ? raw.title : undefined,
       stage: ['parse', 'typecheck', 'run'].includes(raw.stage) ? raw.stage : undefined,
+      hosts: parseHosts(raw.hosts),
+      expectedStdoutNative:
+        typeof raw.expectedStdoutNative === 'string' ? raw.expectedStdoutNative : undefined,
+      expectedStdoutBrowser:
+        typeof raw.expectedStdoutBrowser === 'string' ? raw.expectedStdoutBrowser : undefined,
       expectedDiagnosticContains:
         typeof raw.expectedDiagnosticContains === 'string'
           ? raw.expectedDiagnosticContains
+          : undefined,
+      dekaJson:
+        raw.dekaJson && typeof raw.dekaJson === 'object' && !Array.isArray(raw.dekaJson)
+          ? (raw.dekaJson as Record<string, unknown>)
           : undefined,
       notes: typeof raw.notes === 'string' ? raw.notes : undefined,
     }
@@ -132,9 +153,13 @@ export function loadAllTests(): HatsCategory[] {
         entryPath: entryFile,
         title: metadata.title ?? testName.replace(/_/g, ' '),
         stage: metadata.stage ?? 'run',
+        hosts: metadata.hosts ?? ['native', 'browser'],
         expectedStdout,
+        expectedStdoutNative: metadata.expectedStdoutNative,
+        expectedStdoutBrowser: metadata.expectedStdoutBrowser,
         expectedCode,
         expectedDiagnosticContains: metadata.expectedDiagnosticContains,
+        dekaJson: metadata.dekaJson,
         notes: metadata.notes,
       })
     }

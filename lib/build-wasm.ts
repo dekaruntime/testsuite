@@ -1,5 +1,7 @@
 const MANIFEST_URL = 'https://wasm.deka.gg/latest/deka-compiler-artifact.json'
 
+const LOCAL_WASM = typeof process !== 'undefined' ? process.env.DEKA_WASM : undefined
+
 interface WasmExports {
   memory: WebAssembly.Memory
   deka_compiler_alloc: (size: number) => number
@@ -41,6 +43,24 @@ const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
 
 export async function loadWasmCompiler(): Promise<WasmCompiler> {
+  if (LOCAL_WASM) {
+    const fs = await import('node:fs/promises')
+    const path = await import('node:path')
+    const resolved = path.resolve(LOCAL_WASM)
+    let bytes: Buffer
+    try {
+      bytes = await fs.readFile(resolved)
+    } catch (err) {
+      throw new Error(
+        `DEKA_WASM is set to ${resolved} but that file could not be read: ${String(err)}`
+      )
+    }
+    console.log(`[build-wasm] using local compiler: ${resolved} (${bytes.byteLength} bytes)`)
+    const localModule = await WebAssembly.compile(new Uint8Array(bytes))
+    const localInstance = await WebAssembly.instantiate(localModule, {})
+    return { exports: localInstance.exports as unknown as WasmExports }
+  }
+
   const manifestRes = await fetch(MANIFEST_URL)
   if (!manifestRes.ok) {
     throw new Error(`Failed to fetch compiler manifest: ${manifestRes.status}`)
@@ -55,6 +75,7 @@ export async function loadWasmCompiler(): Promise<WasmCompiler> {
     throw new Error(`Failed to fetch compiler wasm: ${wasmRes.status}`)
   }
   const bytes = await wasmRes.arrayBuffer()
+  console.log(`[build-wasm] using published compiler: ${wasmUrl} (${bytes.byteLength} bytes)`)
 
   const wasmModule = await WebAssembly.compile(bytes)
   const instance = await WebAssembly.instantiate(wasmModule, {})

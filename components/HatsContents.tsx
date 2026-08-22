@@ -6,6 +6,7 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { statusColor } from '@/components/HatsGrid'
 import type { HatsCategoryWithResults } from '@/lib/build-tests'
+import { isRecordedOnly } from '@/lib/recorded-only'
 
 interface HatsContentsProps {
   categories: HatsCategoryWithResults[]
@@ -81,6 +82,7 @@ export function HatsContents({ categories, currentSlug, onSelect, onClose }: Hat
               <ul className="space-y-0.5">
                 {group.tests.map((test) => {
                   const active = test.slug === currentSlug
+                  const cached = isRecordedOnly(test)
                   return (
                     <li key={test.slug}>
                       <Link
@@ -98,6 +100,15 @@ export function HatsContents({ categories, currentSlug, onSelect, onClose }: Hat
                           aria-hidden="true"
                         />
                         <span className="truncate">{test.title}</span>
+                        {cached ? (
+                          <span
+                            className={`ml-auto shrink-0 text-[10px] font-semibold tracking-wide ${
+                              active ? 'text-primary-foreground/80' : 'text-amber-700 dark:text-amber-300'
+                            }`}
+                          >
+                            CACHED
+                          </span>
+                        ) : null}
                       </Link>
                     </li>
                   )

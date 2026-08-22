@@ -4,6 +4,10 @@ import { fileURLToPath } from 'url'
 import { loadWasmCompiler, compileWithWasm, formatDsWithWasm } from '../lib/build-wasm.ts'
 import { runDekaJsDirect } from '@dekaruntime/web-ide-kit/runtime'
 
+// Maintainer seed script only. Public coverage is a PR to tests/. Do not treat
+// this file as the source of truth. Runtime snapshots should come from
+// `deka run` / the browser host (`scripts/regen-fixtures.mjs`), not Node.
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const testsDir = path.join(__dirname, '..', 'tests')
 
