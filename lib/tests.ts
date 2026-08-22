@@ -24,6 +24,7 @@ export interface HatsTest {
   expectedCode?: string
   expectedDiagnosticContains?: string
   dekaJson?: Record<string, unknown>
+  packages?: string[]
   notes?: string
 }
 
@@ -74,6 +75,12 @@ function parseHosts(raw: unknown): HatsHost[] {
   return hosts.length > 0 ? hosts : ['native', 'browser']
 }
 
+function parsePackages(raw: unknown): string[] | undefined {
+  if (!Array.isArray(raw)) return undefined
+  const names = raw.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+  return names.length > 0 ? names : undefined
+}
+
 function readMetadata(dir: string, name: string): Partial<HatsTest> {
   const jsonPath = path.join(dir, `${name}.json`)
   if (!fs.existsSync(jsonPath)) return {}
@@ -95,6 +102,7 @@ function readMetadata(dir: string, name: string): Partial<HatsTest> {
         raw.dekaJson && typeof raw.dekaJson === 'object' && !Array.isArray(raw.dekaJson)
           ? (raw.dekaJson as Record<string, unknown>)
           : undefined,
+      packages: parsePackages(raw.packages),
       notes: typeof raw.notes === 'string' ? raw.notes : undefined,
     }
   } catch {
@@ -160,6 +168,7 @@ export function loadAllTests(): HatsCategory[] {
         expectedCode,
         expectedDiagnosticContains: metadata.expectedDiagnosticContains,
         dekaJson: metadata.dekaJson,
+        packages: metadata.packages,
         notes: metadata.notes,
       })
     }

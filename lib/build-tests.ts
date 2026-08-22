@@ -158,9 +158,10 @@ async function runNativeTest(
   source: string,
   files?: Record<string, string>,
   entryPath?: string,
-  dekaJson?: Record<string, unknown>
+  dekaJson?: Record<string, unknown>,
+  packages?: string[]
 ): Promise<RuntimeResult> {
-  const nativeResult = await runNativeCli(cliPath, source, entryPath, files, { dekaJson })
+  const nativeResult = await runNativeCli(cliPath, source, entryPath, files, { dekaJson, packages })
   const stage: HatsTestStage = nativeResult.ok
     ? 'run'
     : nativeResult.transpileFailed
@@ -253,7 +254,8 @@ async function runAllTestsOnce(): Promise<HatsBuildResults> {
                 test.source,
                 test.files,
                 test.entryPath,
-                test.dekaJson
+                test.dekaJson,
+                test.packages
               )
             : skippedResult(
                 !wantNative
