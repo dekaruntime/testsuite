@@ -20,7 +20,8 @@ import {
 import { terminateSharedSandbox } from '@dekaruntime/web-ide-kit/runtime'
 import { setLspWorkerPath } from '@dekaruntime/web-ide-kit/editor'
 import type { HatsTest } from '@/lib/tests'
-import type { HatsCategoryWithResults } from '@/lib/build-tests'
+import type { HatsCategoryWithResults, HatsTestWithBuildResult, RuntimeResult } from '@/lib/build-tests'
+import { isRecordedOnly } from '@/lib/recorded-only'
 
 setCompilerArtifactPath('https://wasm.deka.gg/latest/deka-compiler-artifact.json')
 setLspWorkerPath('/deka-diagnostics-worker.js')
@@ -57,6 +58,23 @@ function determineStage(js: string | undefined, diagnostics: CompilerDiagnostic[
   return 'run'
 }
 
+function findDumpRecord(
+  categories: HatsCategoryWithResults[],
+  slug: string
+): HatsTestWithBuildResult | undefined {
+  for (const group of categories) {
+    const match = group.tests.find((item) => item.slug === slug)
+    if (match) return match
+  }
+  return undefined
+}
+
+function pickCachedResult(record: HatsTestWithBuildResult): { host: 'native' | 'browser'; result: RuntimeResult } {
+  if (!record.nativeResult.skipped) return { host: 'native', result: record.nativeResult }
+  if (!record.wasmResult.skipped) return { host: 'browser', result: record.wasmResult }
+  return { host: 'native', result: record.nativeResult }
+}
+
 function matchesExpectation(test: HatsTest, result: RunResult, stage: 'parse' | 'typecheck' | 'run', formattedCode?: string): boolean {
   if ((result.ok ? 'pass' : 'fail') !== test.status) return false
   if (stage !== test.stage) return false
@@ -80,6 +98,13 @@ function matchesExpectation(test: HatsTest, result: RunResult, stage: 'parse' | 
 }
 
 export function CaseRunner({ test, categories }: { test: HatsTest; categories: HatsCategoryWithResults[] }) {
+  const dumpRecord = useMemo(() => findDumpRecord(categories, test.slug), [categories, test.slug])
+  const recordedOnly = isRecordedOnly(test)
+  const cached = useMemo(
+    () => (dumpRecord ? pickCachedResult(dumpRecord) : null),
+    [dumpRecord]
+  )
+
   const [source, setSource] = useState(test.source)
   const [contentsOpen, setContentsOpen] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
@@ -291,12 +316,13 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
 
   const handleSourceChange = useCallback(
     (value: string) => {
+      if (recordedOnly) return
       sourceVersionRef.current += 1
       setSource(value)
       setCompileState({ isCompiling: true })
       scheduleAutorun()
     },
-    [scheduleAutorun]
+    [recordedOnly, scheduleAutorun]
   )
 
   const handleClear = useCallback(() => {
@@ -307,6 +333,40 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
     isMountedRef.current = true
     setSource(test.source)
     sourceVersionRef.current += 1
+
+    if (recordedOnly) {
+      if (cached) {
+        const emitted = cached.result.emittedJs
+        const displayJs = emitted ? formatRawJs(emitted) : undefined
+        setOutput({
+          stdout: cached.result.stdout,
+          stderr: cached.result.stderr,
+          error: cached.result.error,
+        })
+        setCompileState({
+          js: emitted,
+          displayJs,
+          isCompiling: false,
+          error: cached.result.ok ? undefined : cached.result.error,
+          diagnostics: cached.result.diagnostics,
+        })
+      } else {
+        setOutput({
+          stdout: '',
+          stderr: '',
+          error: 'No dump recording for this case. Re-run bun scripts/dump-results.mjs.',
+        })
+        setCompileState({
+          isCompiling: false,
+          error: 'No dump recording for this case.',
+        })
+      }
+      setIsRunning(false)
+      return () => {
+        isMountedRef.current = false
+      }
+    }
+
     setOutput({ stdout: '', stderr: '' })
     setCompileState({ isCompiling: true })
     const timer = setTimeout(() => {
@@ -319,7 +379,7 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
         clearTimeout(autorunTimerRef.current)
       }
     }
-  }, [test.slug, test.source, executeRun])
+  }, [test.slug, test.source, executeRun, recordedOnly, cached])
 
   useEffect(() => {
     return () => {
@@ -347,7 +407,9 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
     diagnostics: compileState.diagnostics ?? [],
   }
 
-  const expectationMet = matchesExpectation(test, result, stage, source)
+  const expectationMet = recordedOnly && dumpRecord
+    ? dumpRecord.overallStatus === 'pass'
+    : matchesExpectation(test, result, stage, source)
 
   const handleLeftResize = useCallback(
     (delta: number) => {
@@ -378,6 +440,19 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+      {recordedOnly ? (
+        <div
+          role="status"
+          className="border-b border-amber-500/40 bg-amber-500/15 px-6 py-2 text-center"
+        >
+          <p className="text-xs font-bold tracking-[0.18em] text-amber-900 dark:text-amber-200">
+            CACHED RESULTS
+          </p>
+          <p className="text-[11px] text-amber-900/80 dark:text-amber-200/80">
+            Not live — recorded from the native isolate at dump. The editor is read-only; this page is not frozen or broken.
+          </p>
+        </div>
+      ) : null}
       <header className="border-b border-border px-6 py-3">
         <div className="flex items-center gap-4">
           <a
@@ -395,6 +470,7 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
             <h1 className="text-lg font-bold">{test.title}</h1>
             <p className="text-xs text-muted-foreground">
               {test.category} · expected {test.status} at {test.stage}
+              {recordedOnly ? ` · ${cached?.host ?? 'native'} isolate recording` : ''}
             </p>
           </div>
         </div>
@@ -440,6 +516,7 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
                     </div>
                     <div className="mt-1 text-xs text-muted-foreground">
                       Got {result.ok ? 'pass' : 'fail'} at {stage}
+                      {recordedOnly ? ' · cached dump, not a live run' : ''}
                     </div>
                   </div>
                 )}
@@ -535,36 +612,59 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
             gridTemplateRows: `minmax(0, ${1 - outputHeight}fr) 4px minmax(0, ${outputHeight}fr)`,
           }}
         >
-          <div className="min-h-0 overflow-hidden">
-            <EditorPanel
-              source={source}
-              filename={`${test.slug}.ds`}
-              documentUriPrefix="inmemory://deka-hats/"
-              onChange={handleSourceChange}
-              onRun={executeRun}
-              isRunning={isRunning}
-              compiler={compileState.compiler}
-              formatOnKeystroke={false}
-              formatOnRun={false}
-            />
+          <div className={`relative min-h-0 overflow-hidden ${recordedOnly ? '[&_button:last-of-type]:hidden' : ''}`}>
+            {recordedOnly ? (
+              <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-center border-b border-amber-500/40 bg-amber-500/15 px-3 py-1.5 text-xs font-semibold tracking-wide text-amber-800 dark:text-amber-200">
+                CACHED RESULTS — source is read-only. Not live.
+              </div>
+            ) : null}
+            <div className={recordedOnly ? 'h-full pt-8' : 'h-full'}>
+              <div className="relative h-full">
+                {recordedOnly ? (
+                  <div
+                    className="absolute inset-0 z-10 cursor-default"
+                    aria-hidden="true"
+                    title="Cached recording — source is read-only"
+                  />
+                ) : null}
+                <EditorPanel
+                  source={source}
+                  filename={`${test.slug}.ds`}
+                  documentUriPrefix="inmemory://deka-hats/"
+                  onChange={handleSourceChange}
+                  onRun={recordedOnly ? () => {} : executeRun}
+                  isRunning={isRunning}
+                  compiler={compileState.compiler}
+                  formatOnKeystroke={false}
+                  formatOnRun={false}
+                />
+              </div>
+            </div>
           </div>
 
           <ResizableSplitter direction="horizontal" onResize={handleVerticalResize} />
 
-          <div className="min-h-0 overflow-hidden">
-            <TourOutputPanel
-              stdout={output.stdout}
-              stderr={output.stderr}
-              error={output.error}
-              diagnostics={compileState.diagnostics}
-              source={source}
-              onClear={handleClear}
-              displayJs={compileState.displayJs}
-              compileError={compileState.error}
-              isCompiling={compileState.isCompiling}
-              storageNamespace="deka.hats"
-              ariaLabel="Test output views"
-            />
+          <div className="relative min-h-0 overflow-hidden">
+            {recordedOnly ? (
+              <div className="absolute inset-x-0 top-0 z-20 border-b border-amber-500/40 bg-amber-500/15 px-3 py-1 text-center text-[11px] font-semibold tracking-wide text-amber-800 dark:text-amber-200">
+                CACHED RESULTS — stdout and emitted JS from dump ({cached?.host ?? 'native'}). Not executed in this browser.
+              </div>
+            ) : null}
+            <div className={recordedOnly ? 'h-full pt-7' : 'h-full'}>
+              <TourOutputPanel
+                stdout={output.stdout}
+                stderr={output.stderr}
+                error={output.error}
+                diagnostics={compileState.diagnostics}
+                source={source}
+                onClear={recordedOnly ? () => {} : handleClear}
+                displayJs={compileState.displayJs}
+                compileError={compileState.error}
+                isCompiling={compileState.isCompiling}
+                storageNamespace="deka.hats"
+                ariaLabel="Test output views"
+              />
+            </div>
           </div>
         </div>
       </div>

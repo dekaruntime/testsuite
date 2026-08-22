@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import type { HatsCategoryWithResults, HatsTestWithBuildResult } from '@/lib/build-tests'
+import { isRecordedOnly } from '@/lib/recorded-only'
 
 interface HatsGridProps {
   categories: HatsCategoryWithResults[]
@@ -87,6 +88,12 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
       </header>
 
       <main className="flex-1 p-6">
+        <p className="mb-3 text-xs text-muted-foreground">
+          Squares are dump-time results, not a live run. Open a case to tinker in the browser.
+          Native-only / listed cases show{' '}
+          <span className="font-semibold tracking-wide text-amber-700 dark:text-amber-300">CACHED RESULTS</span>
+          {' '}instead of executing here.
+        </p>
         {normalizedQuery !== '' && (
           <p className="mb-3 text-xs text-muted-foreground">
             {visibleCount} of {total} tests shown
@@ -99,14 +106,17 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
               <span className="mr-1 inline-flex items-center text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 {group.name}
               </span>
-              {group.tests.map((test) => (
-                <Link
-                  key={test.slug}
-                  href={`/case/${test.slug}`}
-                  title={`${test.title}\n${test.category} · wasm: ${test.wasmMatches ? 'match' : 'mismatch'} · native: ${test.nativeMatches ? 'match' : 'mismatch'}`}
-                  className={`inline-flex size-4 rounded-sm transition-opacity hover:opacity-70 ${statusColor(test.overallStatus)}`}
-                />
-              ))}
+              {group.tests.map((test) => {
+                const cached = isRecordedOnly(test)
+                return (
+                  <Link
+                    key={test.slug}
+                    href={`/case/${test.slug}`}
+                    title={`${test.title}\n${test.category} · wasm: ${test.wasmMatches ? 'match' : 'mismatch'} · native: ${test.nativeMatches ? 'match' : 'mismatch'}${cached ? '\nCACHED RESULTS — not live in the browser' : ''}`}
+                    className={`inline-flex size-4 rounded-sm transition-opacity hover:opacity-70 ${statusColor(test.overallStatus)}${cached ? ' ring-1 ring-amber-500/70 ring-offset-1 ring-offset-background' : ''}`}
+                  />
+                )
+              })}
             </span>
           ))}
           {filteredCategories.length === 0 && (

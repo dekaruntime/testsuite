@@ -103,6 +103,8 @@ Each fixture is a DekaScript program. The dump runs it on **Deka**, not on Node.
 
 Pink / divergent means those two Deka hosts disagreed. A fixture can opt into one host via `"hosts": ["native"]` or `["browser"]` in its `.json`.
 
+The grid on the site is dump-time, not live. Open a case to tinker in the browser. Cases that cannot run in the visitor's browser — `"hosts": ["native"]`, or anything listed in `lib/recorded-only.ts` — are read-only and labeled **CACHED RESULTS** (stdout + emitted JS from the last dump). That label means the page is a recording, not frozen or broken.
+
 The dump downloads the published CLI and WASM matching `wasm.deka.gg/latest`, unless you point both at the same unreleased build:
 
 ```bash

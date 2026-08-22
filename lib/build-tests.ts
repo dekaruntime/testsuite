@@ -19,6 +19,7 @@ export interface RuntimeResult {
   stdout: string
   stderr: string
   formattedCode?: string
+  emittedJs?: string
   error?: string
   skipped?: boolean
   skipReason?: string
@@ -147,6 +148,7 @@ async function runBrowserTest(
   return {
     ...runResult,
     formattedCode,
+    emittedJs: compileResult.js,
     diagnostics,
   }
 }
@@ -171,6 +173,7 @@ async function runNativeTest(
     stdout: nativeResult.stdout,
     stderr: nativeResult.stderr,
     error: nativeResult.error,
+    emittedJs: nativeResult.emittedJs,
     diagnostics: nativeResult.diagnostics,
   }
 }

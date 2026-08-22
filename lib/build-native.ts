@@ -24,6 +24,7 @@ export interface NativeRunResult {
   stderr: string
   error?: string
   transpileFailed: boolean
+  emittedJs?: string
   diagnostics: Array<{
     severity: 'error' | 'warning' | 'info'
     message: string
@@ -207,6 +208,18 @@ export async function runNativeCli(
 
     const entryRel = isProject ? `./${entryPath ?? 'main.ds'}` : './test.ds'
 
+    const jsOut = path.join(tmpDir, 'captured.js')
+    const transpiled = spawnSync(cliPath, ['transpile', entryRel, '--out', jsOut], {
+      cwd: tmpDir,
+      encoding: 'utf-8',
+      timeout: 30000,
+      env: { ...process.env, DEKA_SECURITY_NO_PROMPT: '1' },
+    })
+    const emittedJs =
+      transpiled.status === 0 && fs.existsSync(jsOut)
+        ? fs.readFileSync(jsOut, 'utf-8')
+        : undefined
+
     const spawned = spawnSync(cliPath, ['run', entryRel], {
       cwd: tmpDir,
       encoding: 'utf-8',
@@ -238,6 +251,7 @@ export async function runNativeCli(
       stderr,
       error: failed ? firstError : undefined,
       transpileFailed: failed && !ranInIsolate,
+      emittedJs,
       diagnostics,
     }
   } finally {
