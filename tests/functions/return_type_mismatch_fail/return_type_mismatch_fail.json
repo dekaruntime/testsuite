@@ -2,5 +2,5 @@
   "title": "Returning a wrong-typed value fails",
   "stage": "parse",
   "notes": "",
-  "expectedDiagnosticContains": "Return type mismatch: expected int, got string"
+  "expectedDiagnosticContains": "Return type mismatch: expected number, got string"
 }

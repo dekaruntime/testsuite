@@ -1,0 +1,5 @@
+{
+  "title": "import-side-effect-only-001",
+  "stage": "parse",
+  "expectedDiagnosticContains": "Expected '{' after import"
+}

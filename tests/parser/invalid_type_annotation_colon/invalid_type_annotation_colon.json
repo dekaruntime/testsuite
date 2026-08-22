@@ -1,5 +1,5 @@
 {
   "title": "Type annotation with missing type after colon is rejected",
   "stage": "parse",
-  "expectedDiagnosticContains": "Expected"
+  "expectedDiagnosticContains": "Expected '='"
 }

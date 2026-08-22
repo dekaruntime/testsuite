@@ -1,4 +1,5 @@
 {
   "title": "Multiple root JSX elements fail",
-  "stage": "parse"
+  "stage": "parse",
+  "expectedDiagnosticContains": "Syntax error"
 }

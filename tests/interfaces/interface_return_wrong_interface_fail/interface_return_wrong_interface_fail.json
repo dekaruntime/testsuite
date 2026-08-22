@@ -1,5 +1,6 @@
 {
   "title": "Returning the wrong interface type fails",
   "stage": "parse",
-  "notes": ""
+  "notes": "",
+  "expectedDiagnosticContains": "Return type mismatch: expected interface A, got Object<{y: string}>"
 }

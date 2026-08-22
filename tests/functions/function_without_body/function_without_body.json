@@ -2,5 +2,5 @@
   "title": "Function declaration missing a body fails",
   "stage": "parse",
   "notes": "",
-  "expectedDiagnosticContains": "Expected '{'"
+  "expectedDiagnosticContains": "DekaScript parameters use bare identifiers"
 }

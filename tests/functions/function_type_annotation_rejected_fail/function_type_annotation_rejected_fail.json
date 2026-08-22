@@ -2,5 +2,5 @@
   "title": "Function-type parameter annotations are rejected",
   "stage": "parse",
   "notes": "",
-  "expectedDiagnosticContains": "Expected parameter type after"
+  "expectedDiagnosticContains": "Expected parameter type after ':'"
 }
