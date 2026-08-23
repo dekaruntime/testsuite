@@ -219,8 +219,21 @@ async function runAllTestsOnce(): Promise<HatsBuildResults> {
   const wasmManifest = (await (await fetch(WASM_COMPILER_MANIFEST_URL)).json()) as {
     compiler: { version: string }
   }
+  // This version comes from the published CDN manifest, NOT from the compiler
+  // that was just loaded. When DEKA_WASM overrides the artifact the two are
+  // unrelated, and printing the published number next to the local path reads
+  // as corroboration: a run pairing a stale native 0.25.7 against a local wasm
+  // reported "version=0.26.1" throughout and produced 8 phantom divergences.
+  // Say which one it is.
   const version = wasmManifest.compiler.version
-  console.log(`[hats build] wasm compiler version=${version}`)
+  if (process.env.DEKA_WASM) {
+    console.log(
+      `[hats build] wasm compiler: LOCAL artifact, version unverified` +
+        ` (published latest is ${version}; not a claim about this build)`
+    )
+  } else {
+    console.log(`[hats build] wasm compiler version=${version} (published)`)
+  }
   const nativeCliPath = await prepareNativeCli(version)
   const nativeAvailable = nativeCliPath !== null
   const browserAvailable = await prepareBrowserHost()
