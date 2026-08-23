@@ -130,7 +130,7 @@ The dump runs `deka add bytes` against the published index (`deka.gg` → `php_m
 
 These are native-only because the isolate resolves package imports from `php_modules`. The browser Worker cannot `deka add`. They show as **CACHED RESULTS** on the site.
 
-`tests/packages/` is that column. Start with `bytes` (RFD 15). The published tarball is still PHPX (`export function`, `$value`); DekaScript rejects that syntax. The fixtures describe the DekaScript API the package should export. They stay red until the index serves a `.ds` `bytes` module. Do not vendor a fake `bytes` implementation in the fixture to turn them green.
+`tests/packages/` is the original column (`bytes`, RFD 15). Each later stdlib module has its own category: `tests/crypto/`, `tests/jwt/`, `tests/json/`, `tests/fs/`, `tests/tcp/`, `tests/tls/`, `tests/http/`, `tests/time/`. Same rule: declare `packages`, `import` from the package name, native-only. Do not vendor a fake implementation in the fixture to turn them green. They stay red until the index serves the DekaScript module.
 
 Browser-capable coverage for the same idea lives under `tests/unsafe/` (`TextEncoder` / `Uint8Array`) and `tests/types/` (`bytes` as a language type). Those run on both hosts without the package.
 

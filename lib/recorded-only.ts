@@ -13,6 +13,14 @@ import type { HatsHost } from './tests'
  */
 export const RECORDED_ONLY_CATEGORIES = new Set<string>([
   'packages',
+  'crypto',
+  'jwt',
+  'json',
+  'fs',
+  'tcp',
+  'tls',
+  'http',
+  'time',
 ])
 
 export const RECORDED_ONLY_SLUGS = new Set<string>([
