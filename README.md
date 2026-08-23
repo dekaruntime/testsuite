@@ -49,6 +49,7 @@ The suite uses exact string comparison for both stdout and formatted code. Every
 Optional JSON fields:
 
 - `hosts` — `["native","browser"]` (default), or a single host for APIs that only exist there.
+- `packages` — names to install from the package index before `deka run` (e.g. `["bytes"]`). Native-only.
 - `dekaJson` — security manifest copied next to the entry for `deka run`.
 
 Fields:
@@ -103,7 +104,35 @@ Each fixture is a DekaScript program. The dump runs it on **Deka**, not on Node.
 
 Pink / divergent means those two Deka hosts disagreed. A fixture can opt into one host via `"hosts": ["native"]` or `["browser"]` in its `.json`.
 
-The grid on the site is dump-time, not live. Open a case to tinker in the browser. Cases that cannot run in the visitor's browser — `"hosts": ["native"]`, or anything listed in `lib/recorded-only.ts` — are read-only and labeled **CACHED RESULTS** (stdout + emitted JS from the last dump). That label means the page is a recording, not frozen or broken.
+The grid on the site is dump-time, not live. Open a case to tinker in the browser. Cases that cannot run in the visitor's browser — `"hosts": ["native"]`, `"packages": [...]`, or anything listed in `lib/recorded-only.ts` — are read-only and labeled **CACHED RESULTS** (stdout + emitted JS from the last dump). That label means the page is a recording, not frozen or broken.
+
+### Package-index tests (native-only)
+
+Stdlib code is not copied into a fixture. A case that needs `bytes` declares it and imports it:
+
+```json
+{
+  "title": "bytes.from_string + len via package index",
+  "stage": "run",
+  "hosts": ["native"],
+  "packages": ["bytes"]
+}
+```
+
+```ds
+import { from_string, len } from "bytes"
+
+const encoded = from_string("hello")
+console.log(len(encoded))
+```
+
+The dump runs `deka add bytes` against the published index (`deka.gg` → `php_modules/@deka/bytes`), then `deka run`. That is the real install path, not a vendored tree.
+
+These are native-only because the isolate resolves package imports from `php_modules`. The browser Worker cannot `deka add`. They show as **CACHED RESULTS** on the site.
+
+`tests/packages/` is that column. Start with `bytes` (RFD 15). The published tarball is still PHPX (`export function`, `$value`); DekaScript rejects that syntax. The fixtures describe the DekaScript API the package should export. They stay red until the index serves a `.ds` `bytes` module. Do not vendor a fake `bytes` implementation in the fixture to turn them green.
+
+Browser-capable coverage for the same idea lives under `tests/unsafe/` (`TextEncoder` / `Uint8Array`) and `tests/types/` (`bytes` as a language type). Those run on both hosts without the package.
 
 The dump downloads the published CLI and WASM matching `wasm.deka.gg/latest`, unless you point both at the same unreleased build:
 
