@@ -1,5 +1,6 @@
 {
   "title": "Interface field without a type annotation fails",
   "stage": "parse",
-  "notes": ""
+  "notes": "",
+  "expectedDiagnosticContains": "Expected variable"
 }

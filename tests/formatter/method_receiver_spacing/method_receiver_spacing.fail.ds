@@ -1,8 +1,8 @@
 struct Point {
-  x: int,
-  y: int,
+  x: number,
+  y: number,
 }
-fn (p Point) sum(): int {
+fn (p Point) sum(): number {
   return p.x + p.y
 }
 let p = Point { x: 1, y: 2 }

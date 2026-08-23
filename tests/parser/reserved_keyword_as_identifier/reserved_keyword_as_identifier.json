@@ -1,5 +1,5 @@
 {
   "title": "Reserved keyword used as identifier is rejected",
   "stage": "parse",
-  "expectedDiagnosticContains": "bare identifiers"
+  "expectedDiagnosticContains": "DekaScript const declarations require bare identifiers"
 }

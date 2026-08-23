@@ -1,6 +1,6 @@
 {
   "title": "Unmatched JSX closing tag fails",
   "stage": "parse",
-  "expectedDiagnosticContains": "JSX tag name cannot be empty",
+  "expectedDiagnosticContains": "Unexpected token in JSX attributes",
   "notes": ""
 }

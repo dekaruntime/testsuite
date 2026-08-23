@@ -1,5 +1,6 @@
 {
   "title": "Bare return in a void function fails",
   "stage": "parse",
-  "notes": ""
+  "notes": "",
+  "expectedDiagnosticContains": "Return type mismatch: expected object, got null"
 }

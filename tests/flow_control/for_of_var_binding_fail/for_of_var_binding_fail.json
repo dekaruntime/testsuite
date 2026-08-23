@@ -1,6 +1,6 @@
 {
   "title": "For-of with var binding fails",
   "stage": "parse",
-  "expectedDiagnosticContains": "DekaScript for-of requires `const` or `let`",
+  "expectedDiagnosticContains": "Syntax error",
   "notes": "DekaScript for-of loops require `const` or `let`; `var` is rejected."
 }

@@ -1,5 +1,5 @@
 if (true) {
   struct Point {
-    x: int
+    x: number
   }
 }

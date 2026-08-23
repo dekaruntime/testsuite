@@ -1,1 +1,1 @@
-if (true) { struct Point { x: int } }
+if (true) { struct Point { x: number } }

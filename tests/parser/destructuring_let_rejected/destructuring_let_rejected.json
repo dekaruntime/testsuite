@@ -1,5 +1,5 @@
 {
   "title": "Array destructuring in let is rejected",
   "stage": "parse",
-  "expectedDiagnosticContains": "bare identifier"
+  "expectedDiagnosticContains": "DekaScript let declarations require a bare identifier"
 }
