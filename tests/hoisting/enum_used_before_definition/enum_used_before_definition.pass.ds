@@ -1,2 +1,2 @@
-console.log(Color.Red.__case)
+console.log(Color.Red.name)
 enum Color { Red Green }
