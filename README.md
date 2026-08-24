@@ -134,7 +134,9 @@ These are native-only because the isolate resolves package imports from `php_mod
 
 Browser-capable coverage for the same idea lives under `tests/unsafe/` (`TextEncoder` / `Uint8Array`) and `tests/types/` (`bytes` as a language type). Those run on both hosts without the package.
 
-The dump downloads the published CLI and WASM matching `wasm.deka.gg/latest`, unless you point both at the same unreleased build:
+The dump loads the published WASM from `wasm.deka.gg/latest`, then reads **`deka_compiler_metadata()` from the bytes** and downloads the native CLI of that version. Do not trust the CDN sidecar for identity: `v0.28.0` advertised 0.28.0 while the artifact said 0.27.0 (deka#279). A fixture whose requested host is absent is **skipped**, not failed (RFD 26).
+
+Override both hosts together for an unreleased build:
 
 ```bash
 DEKA_NATIVE=../deka/target/release/cli \

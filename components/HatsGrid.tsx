@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import type { HatsCategoryWithResults, HatsTestWithBuildResult } from '@/lib/build-tests'
+import type { HatsOverallStatus } from '@/lib/overall-status'
 import { isRecordedOnly } from '@/lib/recorded-only'
 
 interface HatsGridProps {
@@ -12,7 +13,7 @@ interface HatsGridProps {
   version: string
 }
 
-export function statusColor(status: 'pass' | 'fail' | 'divergent'): string {
+export function statusColor(status: HatsOverallStatus): string {
   switch (status) {
     case 'pass':
       return 'bg-green-500'
@@ -20,6 +21,8 @@ export function statusColor(status: 'pass' | 'fail' | 'divergent'): string {
       return 'bg-pink-500'
     case 'fail':
       return 'bg-red-500'
+    case 'skip':
+      return 'bg-zinc-400'
   }
 }
 
@@ -54,6 +57,7 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
   const passing = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'pass').length
   const failing = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'fail').length
   const divergent = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'divergent').length
+  const skipped = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'skip').length
   const visibleCount = filteredCategories.flatMap((c) => c.tests).length
 
   return (
@@ -69,7 +73,8 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
         </div>
         <div className="flex items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            deka v{version} · {passing} passing · {failing} failing · {divergent} drift · {total} tests
+            deka v{version} · {passing} passing · {failing} failing · {divergent} drift
+            {skipped > 0 ? ` · ${skipped} skipped` : ''} · {total} tests
             {!nativeAvailable && (
               <span className="ml-2 text-amber-500">native runtime unavailable</span>
             )}

@@ -15,6 +15,13 @@ interface WasmExports {
     modeLen: number
   ) => number
   deka_compiler_format_ds: (sourcePtr: number, sourceLen: number) => number
+  deka_compiler_metadata?: () => number
+}
+
+export interface WasmCompilerMetadata {
+  name: string
+  version: string
+  source_commit: string
 }
 
 export interface BuildCompileResult {
@@ -35,7 +42,7 @@ export interface BuildFormatResult {
   error?: string
 }
 
-interface WasmCompiler {
+export interface WasmCompiler {
   exports: WasmExports
 }
 
@@ -80,6 +87,45 @@ export async function loadWasmCompiler(): Promise<WasmCompiler> {
   const wasmModule = await WebAssembly.compile(bytes)
   const instance = await WebAssembly.instantiate(wasmModule, {})
   return { exports: instance.exports as unknown as WasmExports }
+}
+
+function readWasmJson(exports: WasmExports, resultPtr: number): string {
+  const resultView = new DataView(exports.memory.buffer)
+  const jsonPtr = resultView.getUint32(resultPtr, true)
+  const jsonLen = resultView.getUint32(resultPtr + 4, true)
+  const jsonBytes = new Uint8Array(exports.memory.buffer, jsonPtr, jsonLen)
+  const jsonText = textDecoder.decode(jsonBytes)
+  exports.deka_compiler_free(resultPtr, 8 + jsonLen)
+  return jsonText
+}
+
+/**
+ * Identity of the loaded compiler, from the wasm bytes themselves.
+ * Do not substitute the CDN sidecar: that is how v0.28.0 advertised 0.28.0
+ * while deka_compiler_metadata() said 0.27.0 (deka#279).
+ */
+export function readCompilerMetadata(compiler: WasmCompiler): WasmCompilerMetadata {
+  const metaFn = compiler.exports.deka_compiler_metadata
+  if (typeof metaFn !== 'function') {
+    throw new Error(
+      'wasm exports no deka_compiler_metadata; cannot prove compiler identity. Rebuild from a current deka checkout.'
+    )
+  }
+  const jsonText = readWasmJson(compiler.exports, metaFn())
+  let parsed: Partial<WasmCompilerMetadata>
+  try {
+    parsed = JSON.parse(jsonText) as Partial<WasmCompilerMetadata>
+  } catch {
+    throw new Error(`deka_compiler_metadata returned invalid JSON: ${jsonText}`)
+  }
+  if (!parsed.version) {
+    throw new Error(`deka_compiler_metadata missing version: ${jsonText}`)
+  }
+  return {
+    name: typeof parsed.name === 'string' ? parsed.name : 'deka',
+    version: parsed.version,
+    source_commit: typeof parsed.source_commit === 'string' ? parsed.source_commit : 'unknown',
+  }
 }
 
 function normalizeDiagnostics(value: unknown): BuildCompileResult['diagnostics'] {
