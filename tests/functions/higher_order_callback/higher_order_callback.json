@@ -1,5 +1,5 @@
 {
-  "title": "Higher-order function receives callable object and invokes it",
+  "title": "Higher-order function receives a function-typed callback",
   "stage": "run",
-  "notes": ""
+  "notes": "Callback parameter is `fn(number) number`, not `object`."
 }
