@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Harness unit tests
+        run: bun test lib
+
       - name: Install Chromium for the browser host
         run: bunx playwright install chromium
 

@@ -62,37 +62,44 @@ async function main() {
   let overallPass = 0
   let overallFail = 0
   let overallDivergent = 0
+  let overallSkip = 0
 
   for (const category of categories) {
     let catPass = 0
     let catFail = 0
     let catDivergent = 0
+    let catSkip = 0
     for (const test of category.tests) {
       if (test.overallStatus === 'pass') catPass++
       else if (test.overallStatus === 'fail') catFail++
+      else if (test.overallStatus === 'skip') catSkip++
       else catDivergent++
     }
     overallPass += catPass
     overallFail += catFail
     overallDivergent += catDivergent
+    overallSkip += catSkip
     console.log(
-      `${category.name.padEnd(24)} | pass ${String(catPass).padStart(3)} | fail ${String(catFail).padStart(3)} | divergent ${String(catDivergent).padStart(3)}`
+      `${category.name.padEnd(24)} | pass ${String(catPass).padStart(3)} | fail ${String(catFail).padStart(3)} | divergent ${String(catDivergent).padStart(3)} | skip ${String(catSkip).padStart(3)}`
     )
   }
 
   if (!categoryFilter) {
-    console.log('-'.repeat(60))
+    console.log('-'.repeat(72))
     console.log(
-      `${'TOTAL'.padEnd(24)} | pass ${String(overallPass).padStart(3)} | fail ${String(overallFail).padStart(3)} | divergent ${String(overallDivergent).padStart(3)}`
+      `${'TOTAL'.padEnd(24)} | pass ${String(overallPass).padStart(3)} | fail ${String(overallFail).padStart(3)} | divergent ${String(overallDivergent).padStart(3)} | skip ${String(overallSkip).padStart(3)}`
     )
     console.log(`Hosts: native=${results.nativeAvailable} browser=${results.browserAvailable}`)
+    if (results.wasmSourceCommit) {
+      console.log(`Wasm:  version=${results.version} source_commit=${results.wasmSourceCommit}`)
+    }
   }
   console.log(`Elapsed: ${elapsed}s`)
 
   const notPassing = []
   for (const category of categories) {
     for (const test of category.tests) {
-      if (test.overallStatus === 'pass') continue
+      if (test.overallStatus === 'pass' || test.overallStatus === 'skip') continue
       const line = `${test.category}/${test.name}: expected ${test.status} at ${test.stage}, got ${test.overallStatus}`
       const detail = []
       if (test.wasmResult.error) detail.push(`    browser: ${test.wasmResult.error.split('\n')[0]}`)
@@ -149,7 +156,10 @@ async function main() {
       '',
       pre ? formatPreflight(pre) : '',
       `hosts: native=${results.nativeAvailable} browser=${results.browserAvailable}`,
-      `totals: pass ${overallPass} | fail ${overallFail} | divergent ${overallDivergent}`,
+      results.wasmSourceCommit
+        ? `wasm: version=${results.version} source_commit=${results.wasmSourceCommit}`
+        : '',
+      `totals: pass ${overallPass} | fail ${overallFail} | divergent ${overallDivergent} | skip ${overallSkip}`,
       `elapsed: ${elapsed}s`,
       '',
       `not passing: ${notPassing.length}`,

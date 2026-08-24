@@ -37,13 +37,18 @@ function repoRootFor(artifactPath) {
 }
 
 /**
- * deka has no [workspace.package] block - each crate carries its own version.
- * The binary under test is the `cli` crate, so that is the version to compare
- * against. Do NOT use the published CDN manifest for this: v0.26.1 was tagged
- * on a tree whose cli crate says 0.26.0, so the published label and the source
- * tree genuinely disagree.
+ * The runtime version lives in `[workspace.package]` (deka#278). Fall back to
+ * `crates/cli` for checkouts from before that. Do NOT use the published CDN
+ * manifest: v0.28.0 was tagged on a 0.27.0 tree (deka#279).
  */
 function cliCrateVersion(repoRoot) {
+  try {
+    const root = readFileSync(join(repoRoot, 'Cargo.toml'), 'utf8')
+    const workspace = root.match(/\[workspace\.package\][^\[]*version\s*=\s*"([^"]+)"/)
+    if (workspace) return workspace[1]
+  } catch {
+    // fall through to the crate file
+  }
   try {
     const toml = readFileSync(join(repoRoot, 'crates', 'cli', 'Cargo.toml'), 'utf8')
     return toml.match(/^version\s*=\s*"([^"]+)"/m)?.[1]
@@ -110,8 +115,9 @@ export function preflight() {
   }
 
   // --- version match -------------------------------------------------------
-  // The wasm artifact exports no version function, so it cannot self-report.
-  // The checkout that produced both artifacts can, and a native binary whose
+  // The wasm self-reports via deka_compiler_metadata(); build-tests.ts reads
+  // that and pairs the native CLI against it. Preflight checks the native
+  // binary against the checkout that produced it. A native binary whose
   // version trails its own tree is a stale build - the case that silently
   // produced 8 phantom divergences.
   if (nativeEnv && existsSync(resolve(nativeEnv))) {
