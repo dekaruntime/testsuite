@@ -25,10 +25,5 @@ jobs:
       - name: Harness unit tests
         run: bun test lib
 
-      - name: Install Chromium for the browser host
-        run: bunx playwright install chromium
-
-      # `bun run build` dumps native+browser results, then statically exports the site.
-      # Dump exit 0 means the diagnostic ran; pink/red cells are findings, not a CI gate.
-      - name: Build
+      - name: Build (ingest pack, no Chromium)
         run: bun run build

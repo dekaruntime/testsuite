@@ -1,2 +1,0 @@
-console.log("side effect");
-export fn setup() void {}

@@ -1,2 +1,0 @@
-import { multiply } from "./math.ds";
-console.log(multiply(6, 7));

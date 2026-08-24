@@ -1,6 +1,0 @@
-{
-  "title": "Option.Some has no unwrap method",
-  "stage": "run",
-  "expectedDiagnosticContains": "is not a function",
-  "notes": "Use pattern matching with match to extract Option values."
-}

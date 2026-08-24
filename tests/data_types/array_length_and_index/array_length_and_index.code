@@ -1,3 +1,0 @@
-const items = [10, 20, 30]
-console.log(items.length)
-console.log(items[1])

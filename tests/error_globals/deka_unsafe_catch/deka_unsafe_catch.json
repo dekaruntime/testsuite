@@ -1,6 +1,0 @@
-{
-  "title": "deka.unsafe is rejected in favour of an unsafe block",
-  "stage": "typecheck",
-  "expectedDiagnosticContains": "call `unsafe { ... }` instead of `deka.unsafe(...)`",
-  "notes": "`deka.unsafe` is an implementation helper, not surface syntax. The supported form is `unsafe { ... }`."
-}

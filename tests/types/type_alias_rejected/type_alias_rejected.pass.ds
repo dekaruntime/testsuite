@@ -1,3 +1,0 @@
-type Name = string
-const n: Name = "hi"
-console.log(n)

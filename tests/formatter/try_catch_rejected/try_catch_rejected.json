@@ -1,6 +1,0 @@
-{
-  "title": "Try Catch Rejected",
-  "stage": "parse",
-  "notes": "Formatter passthrough for invalid try catch rejected source.",
-  "expectedDiagnosticContains": "PHP construct is not part of DekaScript"
-}

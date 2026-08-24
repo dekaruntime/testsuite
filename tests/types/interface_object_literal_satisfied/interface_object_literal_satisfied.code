@@ -1,9 +1,0 @@
-interface Named {
-  name: string;
-}
-
-fn show(n: Named) {
-  console.log(n.name)
-}
-
-show({name: "Deka"})

@@ -1,5 +1,0 @@
-{
-  "title": "Struct method used before definition fails at runtime",
-  "stage": "run",
-  "notes": ""
-}

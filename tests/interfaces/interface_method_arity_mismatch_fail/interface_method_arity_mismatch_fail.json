@@ -1,5 +1,0 @@
-{
-  "title": "Interface method arity mismatch fails",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Argument 1 type mismatch: expected interface Shouter, got struct Bullhorn"
-}

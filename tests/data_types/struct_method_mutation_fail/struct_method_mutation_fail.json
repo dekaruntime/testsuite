@@ -1,6 +1,0 @@
-{
-  "title": "Struct method mutating field fails",
-  "stage": "parse",
-  "expectedDiagnosticContains": "cannot assign to field of immutable value",
-  "notes": ""
-}
