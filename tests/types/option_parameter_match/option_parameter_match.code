@@ -1,4 +1,4 @@
-fn greet(name: Option<string>): string {
+fn greet(name: Option<string>) string {
   return match (name) {
     Some(n) => "Hello " + n,
     None => "Hello stranger",

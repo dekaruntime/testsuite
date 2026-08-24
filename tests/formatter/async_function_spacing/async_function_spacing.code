@@ -1,4 +1,4 @@
-async fn fetch(): Promise<number> {
+async fn fetch() Promise<number> {
   return 1
 }
 const p = fetch()

@@ -1,4 +1,4 @@
-fn scale(x: number, factor: number = x): number {
+fn scale(x: number, factor: number = x) number {
   return x * factor
 }
 

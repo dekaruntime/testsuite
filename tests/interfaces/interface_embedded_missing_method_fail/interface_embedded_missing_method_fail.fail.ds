@@ -1,5 +1,5 @@
 interface Mover {
-  fn move(): string
+  fn move() string
 }
 struct Wheels {}
 struct Robot {

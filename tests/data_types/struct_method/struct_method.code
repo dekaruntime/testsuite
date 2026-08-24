@@ -3,7 +3,7 @@ struct Point {
   y: number;
 }
 
-fn (p Point) sum(): number {
+fn (p Point) sum() number {
   return p.x + p.y
 }
 

@@ -1,5 +1,5 @@
 struct Person {}
-fn (p Person) greet(): string {
+fn (p Person) greet() string {
   return "Hello"
 }
 
@@ -8,7 +8,7 @@ struct Employee {
   name: string;
 }
 
-fn (e Employee) greet(): string {
+fn (e Employee) greet() string {
   return "Hi, " + e.name
 }
 

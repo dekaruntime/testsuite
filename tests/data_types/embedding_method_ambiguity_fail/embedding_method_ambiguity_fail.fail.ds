@@ -1,9 +1,9 @@
 struct Runner {}
-fn (r Runner) move(): string {
+fn (r Runner) move() string {
   return "running"
 }
 struct Swimmer {}
-fn (s Swimmer) move(): string {
+fn (s Swimmer) move() string {
   return "swimming"
 }
 struct Triathlete {

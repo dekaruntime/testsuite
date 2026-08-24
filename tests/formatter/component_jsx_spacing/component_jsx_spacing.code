@@ -1,5 +1,5 @@
 const ui = globalThis.deka.ui
-fn Card(props: object): object {
+fn Card(props: object) object {
   return ui.jsxs("div", {className: "card", children: props.title})
 }
 const html = ui.renderToString(ui.jsxs(Card, {title: "Hello"}))

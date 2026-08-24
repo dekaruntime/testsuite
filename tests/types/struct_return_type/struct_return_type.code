@@ -2,7 +2,7 @@ struct Box {
   value: number;
 }
 
-fn makeBox(v: number): Box {
+fn makeBox(v: number) Box {
   return Box { value: v }
 }
 

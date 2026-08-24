@@ -1,5 +1,5 @@
 const ui = globalThis.deka.ui
-fn Box(props: object): object {
+fn Box(props: object) object {
   return ui.jsxs("div", {class: props.class, children: props.children})
 }
 

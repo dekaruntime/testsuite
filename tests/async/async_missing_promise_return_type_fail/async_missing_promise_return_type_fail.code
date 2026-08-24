@@ -1,4 +1,4 @@
-async fn value(): number {
+async fn value() number {
   return 1
 }
 

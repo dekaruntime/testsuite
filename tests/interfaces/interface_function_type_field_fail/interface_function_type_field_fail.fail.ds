@@ -1,7 +1,7 @@
 interface Op {
-  op: fn(number, number): number
+  op: fn(number, number) number
 }
-fn add(a: number, b: number): number {
+fn add(a: number, b: number) number {
   return a + b
 }
 fn run(o: Op) {

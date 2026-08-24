@@ -1,2 +1,2 @@
-fn f(): NotAType {}
+fn f() NotAType {}
 console.log("ok")

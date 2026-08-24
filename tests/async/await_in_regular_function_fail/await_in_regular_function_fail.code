@@ -1,4 +1,4 @@
-fn normal(): number {
+fn normal() number {
   return await 1
 }
 normal()

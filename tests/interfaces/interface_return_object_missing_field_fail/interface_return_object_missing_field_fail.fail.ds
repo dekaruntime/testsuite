@@ -1,7 +1,7 @@
 interface Named {
   name: string
 }
-fn makeNamed(): Named {
+fn makeNamed() Named {
   return {}
 }
 console.log(makeNamed().name)

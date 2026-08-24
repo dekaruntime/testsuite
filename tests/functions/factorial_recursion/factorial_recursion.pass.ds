@@ -1,4 +1,4 @@
-fn factorial(n: number): number {
+fn factorial(n: number) number {
   if (n <= 1) {
     return 1
   }

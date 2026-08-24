@@ -1,4 +1,4 @@
-async fn fetch(): Promise<string> {
+async fn fetch() Promise<string> {
   return "data"
 }
 const result = fetch()

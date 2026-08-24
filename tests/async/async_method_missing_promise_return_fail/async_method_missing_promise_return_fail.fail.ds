@@ -2,7 +2,7 @@ struct Counter {
   count: number
 }
 
-async fn (c Counter) fetch(): number {
+async fn (c Counter) fetch() number {
   return c.count
 }
 

@@ -97,6 +97,40 @@ async function main() {
       const detail = []
       if (test.wasmResult.error) detail.push(`    browser: ${test.wasmResult.error.split('\n')[0]}`)
       if (test.nativeResult.error) detail.push(`    native:  ${test.nativeResult.error.split('\n')[0]}`)
+
+      // A stdout mismatch used to print nothing at all, which meant a failing
+      // fixture told you THAT it failed and never WHAT differed -- the reader
+      // was left to guess, and guessing is how a console.log regression got
+      // misdiagnosed as an unsafe-block regression.
+      // Per-host outcome. Divergence means the hosts disagreed, and until now
+      // the report never said HOW -- same message on both sides read as
+      // identical behaviour when the difference was ok/stage.
+      // `matches` is what divergence is computed from (nativeMatches !==
+      // browserMatches), and it is broader than `ok` -- a host can run fine and
+      // still not match the fixture's expectation. Printing `ok` alone made two
+      // disagreeing hosts look identical.
+      detail.push(
+        `    native  ok=${test.nativeResult.ok} matches=${test.nativeMatches}` +
+          `  |  browser ok=${test.wasmResult.ok} matches=${test.wasmMatches}` +
+          `  (stage ${test.stage}, expected ${test.status})`
+      )
+      if (test.nativeMatches !== test.wasmMatches) {
+        const j = (v) => (v === undefined ? '<none>' : JSON.stringify(v))
+        detail.push(`    native  stdout: ${j(test.nativeResult.stdout)}`)
+        detail.push(`    browser stdout: ${j(test.wasmResult.stdout)}`)
+      }
+
+      const expected = test.expectedStdout
+      if (expected !== undefined && test.overallStatus !== 'pass') {
+        const show = (v) => (v === undefined ? '<none>' : JSON.stringify(v))
+        if (test.nativeResult.stdout !== expected || test.wasmResult.stdout !== expected) {
+          detail.push(`    expected: ${show(expected)}`)
+          if (test.nativeResult.stdout !== expected)
+            detail.push(`    native   got: ${show(test.nativeResult.stdout)}`)
+          if (test.wasmResult.stdout !== expected)
+            detail.push(`    browser  got: ${show(test.wasmResult.stdout)}`)
+        }
+      }
       notPassing.push({ line, detail })
     }
   }

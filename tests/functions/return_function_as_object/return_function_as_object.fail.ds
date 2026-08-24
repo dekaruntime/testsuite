@@ -1,5 +1,5 @@
-fn makeAdder(base: number): object {
-  const adder = fn(x: number): number {
+fn makeAdder(base: number) object {
+  const adder = fn(x: number) number {
     return x + base
   }
   return adder

@@ -1,4 +1,4 @@
-fn foo(): void {
+fn foo() void {
   return
 }
 foo()

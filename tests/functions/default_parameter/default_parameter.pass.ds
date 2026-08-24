@@ -1,4 +1,4 @@
-fn greet(greeting: string = "hi"): void {
+fn greet(greeting: string = "hi") void {
   console.log(greeting)
 }
 greet()

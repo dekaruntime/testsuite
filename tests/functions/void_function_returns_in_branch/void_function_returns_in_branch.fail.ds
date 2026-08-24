@@ -1,4 +1,4 @@
-fn logIfPositive(n: number): void {
+fn logIfPositive(n: number) void {
   if (n > 0) {
     return n
   }

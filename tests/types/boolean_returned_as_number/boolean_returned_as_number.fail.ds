@@ -1,4 +1,4 @@
-fn flag(): boolean {
+fn flag() boolean {
   return 1
 }
 console.log(flag())

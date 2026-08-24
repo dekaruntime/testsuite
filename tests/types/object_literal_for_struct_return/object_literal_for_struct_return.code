@@ -2,7 +2,7 @@ struct Box {
   value: number;
 }
 
-fn identity(b: Box): Box {
+fn identity(b: Box) Box {
   return {value: 7}
 }
 

@@ -2,12 +2,12 @@ interface Named {
   name: string
 }
 interface Greetable extends Named {
-  fn greet(): string
+  fn greet() string
 }
 struct Person {
   name: string
 }
-fn (p Person) greet(): string {
+fn (p Person) greet() string {
   return "Hi " + p.name
 }
 fn meet(g: Greetable) {

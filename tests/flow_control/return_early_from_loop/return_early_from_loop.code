@@ -1,4 +1,4 @@
-fn find(xs: Array<number>, target: number): number {
+fn find(xs: Array<number>, target: number) number {
   for (const x of xs) {
     if (x === target) {
       return x

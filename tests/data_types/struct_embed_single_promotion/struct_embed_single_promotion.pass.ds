@@ -1,5 +1,5 @@
 struct Mover {}
-fn (m Mover) move(): string {
+fn (m Mover) move() string {
   return "moving"
 }
 struct Robot {

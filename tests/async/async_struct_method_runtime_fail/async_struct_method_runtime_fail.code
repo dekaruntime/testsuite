@@ -2,7 +2,7 @@ struct Counter {
   count: number;
 }
 
-async fn (c Counter) fetch(): Promise<number> {
+async fn (c Counter) fetch() Promise<number> {
   return c.count
 }
 

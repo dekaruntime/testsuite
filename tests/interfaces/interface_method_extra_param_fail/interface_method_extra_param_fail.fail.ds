@@ -1,10 +1,10 @@
 interface Greeter {
-  fn greet(): string
+  fn greet() string
 }
 struct Person {
   name: string
 }
-fn (p Person) greet(extra: string): string {
+fn (p Person) greet(extra: string) string {
   return p.name
 }
 fn welcome(g: Greeter) {
