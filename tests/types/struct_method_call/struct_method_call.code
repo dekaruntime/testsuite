@@ -2,7 +2,7 @@ struct Counter {
   value: number;
 }
 
-fn (c Counter) get(): number {
+fn (c Counter) get() number {
   return c.value
 }
 

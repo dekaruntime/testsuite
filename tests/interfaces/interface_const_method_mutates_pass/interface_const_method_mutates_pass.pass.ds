@@ -1,10 +1,10 @@
 interface Counter {
-  fn increment(): void
+  fn increment() void
 }
 struct Clicker {
   count: number
 }
-fn (c mut Clicker) increment(): void {
+fn (c mut Clicker) increment() void {
   c.count = c.count + 1
 }
 fn bump(i: Counter) {

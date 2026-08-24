@@ -1,8 +1,8 @@
-async fn one(): Promise<number> {
+async fn one() Promise<number> {
   return 1
 }
 
-async fn two(): Promise<number> {
+async fn two() Promise<number> {
   return 2
 }
 

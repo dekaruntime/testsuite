@@ -1,5 +1,5 @@
 async fn outer() {
-  const f = fn(): number { return await 1 }
+  const f = fn() number { return await 1 }
   console.log(f())
 }
 

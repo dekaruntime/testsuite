@@ -7,7 +7,7 @@ interface HasShape {
   shape: Shape;
 }
 
-fn area(h: HasShape): number {
+fn area(h: HasShape) number {
   return match (h.shape) {
     Shape.Circle(r) => r * r,
     Shape.Square(s) => s * s,

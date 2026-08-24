@@ -1,4 +1,4 @@
-async fn pick(n: number): Promise<string> {
+async fn pick(n: number) Promise<string> {
   return match (n) {
     1 => "one",
     2 => "two",

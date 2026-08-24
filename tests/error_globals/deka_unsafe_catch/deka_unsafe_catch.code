@@ -1,8 +1,8 @@
-fn okFn(): number {
+fn okFn() number {
   panic("inner")
 }
 
-fn catchFn(e: string): number {
+fn catchFn(e: string) number {
   return 99
 }
 

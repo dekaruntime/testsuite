@@ -1,4 +1,4 @@
-fn log(x: number): void {
+fn log(x: number) void {
   console.log(x)
 }
 

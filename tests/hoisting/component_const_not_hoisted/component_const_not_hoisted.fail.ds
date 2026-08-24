@@ -1,4 +1,4 @@
 const app = <Card />
-const Card = fn(): Component {
+const Card = fn() Component {
   return <div>hi</div>
 }

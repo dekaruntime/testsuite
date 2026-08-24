@@ -1,2 +1,2 @@
-fn empty(): number
+fn empty() number
 console.log(empty())

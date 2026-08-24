@@ -1,8 +1,8 @@
 interface Logger {
-  fn log(msg: string): void {}
+  fn log(msg: string) void {}
 }
 
-fn makeLogger(): Logger {
+fn makeLogger() Logger {
   return {log: fn(msg: string) { console.log(msg) }}
 }
 

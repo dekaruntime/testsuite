@@ -1,6 +1,6 @@
-fn outer(flag: boolean): number {
+fn outer(flag: boolean) number {
   if (flag) {
-    fn inner(): number {
+    fn inner() number {
       return 1
     }
     return inner()

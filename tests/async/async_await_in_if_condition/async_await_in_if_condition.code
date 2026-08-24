@@ -1,4 +1,4 @@
-async fn truthy(): Promise<boolean> {
+async fn truthy() Promise<boolean> {
   return true
 }
 

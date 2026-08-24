@@ -1,4 +1,4 @@
-fn maybeReturn(x: boolean): number {
+fn maybeReturn(x: boolean) number {
   if (x) {
     return 1
   } else {

@@ -1,4 +1,4 @@
-fn callObject(obj: object): number {
+fn callObject(obj: object) number {
   return obj()
 }
 console.log(callObject({}))

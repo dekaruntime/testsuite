@@ -1,4 +1,4 @@
-async fn greet(name: string): Promise<void> {
+async fn greet(name: string) Promise<void> {
   console.log(name)
 }
 

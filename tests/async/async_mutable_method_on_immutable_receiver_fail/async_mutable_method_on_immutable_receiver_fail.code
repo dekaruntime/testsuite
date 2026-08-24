@@ -2,7 +2,7 @@ struct Counter {
   count: number;
 }
 
-async fn (c mut Counter) inc(): Promise<void> {
+async fn (c mut Counter) inc() Promise<void> {
   c.count = c.count + 1
 }
 

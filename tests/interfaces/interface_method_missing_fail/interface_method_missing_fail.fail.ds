@@ -1,5 +1,5 @@
 interface Greeter {
-  fn greet(): string
+  fn greet() string
 }
 struct Person {
   name: string

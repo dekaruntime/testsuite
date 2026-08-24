@@ -1,9 +1,9 @@
 interface Mover {
-  fn move(): string {}
+  fn move() string {}
 }
 
 struct Legs {}
-fn (l Legs) move(): string {
+fn (l Legs) move() string {
   return "walking"
 }
 

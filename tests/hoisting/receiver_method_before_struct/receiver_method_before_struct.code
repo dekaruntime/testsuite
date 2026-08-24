@@ -1,4 +1,4 @@
-fn (p Person) greet(): string {
+fn (p Person) greet() string {
   return "hi, " + p.name
 }
 struct Person {

@@ -1,4 +1,4 @@
-fn add(x: number, y: number): number {
+fn add(x: number, y: number) number {
   return x + y
 }
 

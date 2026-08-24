@@ -1,4 +1,4 @@
-async fn value(): Promise {
+async fn value() Promise {
   return 1
 }
 

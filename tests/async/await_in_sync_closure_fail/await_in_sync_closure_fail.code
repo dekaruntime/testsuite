@@ -1,8 +1,8 @@
-async fn value(): Promise<number> {
+async fn value() Promise<number> {
   return 1
 }
 
-const f = fn (): Promise<number> {
+const f = fn () Promise<number> {
   return await value()
 }
 

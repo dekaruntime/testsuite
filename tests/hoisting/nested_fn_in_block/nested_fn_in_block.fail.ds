@@ -1,1 +1,1 @@
-{ fn helper(): number { return 1 } }
+{ fn helper() number { return 1 } }

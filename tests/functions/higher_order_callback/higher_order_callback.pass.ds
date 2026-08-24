@@ -1,7 +1,7 @@
-fn applyTwice(f: object, x: number): number {
+fn applyTwice(f: object, x: number) number {
   return f(f(x))
 }
-fn increment(n: number): number {
+fn increment(n: number) number {
   return n + 1
 }
 console.log(applyTwice(increment, 5))

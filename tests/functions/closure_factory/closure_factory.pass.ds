@@ -1,5 +1,5 @@
 fn makeMultiplier(factor: number) {
-  const mul = fn(x: number): number {
+  const mul = fn(x: number) number {
     return x * factor
   }
   return mul

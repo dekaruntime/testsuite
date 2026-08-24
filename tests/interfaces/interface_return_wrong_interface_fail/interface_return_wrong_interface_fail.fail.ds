@@ -4,7 +4,7 @@ interface A {
 interface B {
   y: string
 }
-fn getA(): A {
+fn getA() A {
   return { y: "oops" }
 }
 console.log(getA().x)

@@ -1,10 +1,10 @@
 interface Greeter {
-  fn greet(): string
+  fn greet() string
 }
 struct Person {
   name: string
 }
-fn (p Person) greet(): number {
+fn (p Person) greet() number {
   return 1
 }
 fn welcome(g: Greeter) {

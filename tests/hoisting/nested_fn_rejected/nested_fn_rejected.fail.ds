@@ -1,5 +1,5 @@
 if (true) {
-  fn helper(): number {
+  fn helper() number {
     return 1
   }
 }

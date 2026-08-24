@@ -3,7 +3,7 @@ struct Counter {
 }
 const c = Counter { count: 0 }
 const c2 = c.inc()
-fn (c Counter) inc(): Counter {
+fn (c Counter) inc() Counter {
   return Counter { count: c.count + 1 }
 }
 console.log(c2.count)

@@ -1,4 +1,4 @@
-async fn double(x: number): Promise<number> {
+async fn double(x: number) Promise<number> {
   return x * 2
 }
 async fn main() {

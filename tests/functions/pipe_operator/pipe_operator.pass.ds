@@ -1,7 +1,7 @@
-fn inc(n: number): number {
+fn inc(n: number) number {
   return n + 1
 }
-fn dbl(n: number): number {
+fn dbl(n: number) number {
   return n * 2
 }
 const result = 5 |> dbl |> inc

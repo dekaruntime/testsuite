@@ -1,7 +1,7 @@
 struct Store {
   count: number
 }
-fn (s Store) async load(): Promise<number> {
+fn (s Store) async load() Promise<number> {
   return s.count
 }
 const store = Store { count: 5 }

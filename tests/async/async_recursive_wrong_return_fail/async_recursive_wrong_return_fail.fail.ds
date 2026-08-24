@@ -1,4 +1,4 @@
-async fn countdown(n: number): Promise<number> {
+async fn countdown(n: number) Promise<number> {
   if (n <= 0) {
     return "done"
   }

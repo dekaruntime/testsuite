@@ -1,4 +1,4 @@
-fn sum(n: number): number {
+fn sum(n: number) number {
   if (n <= 0) {
     return "done"
   }

@@ -3,14 +3,14 @@ interface Named {
 }
 
 interface Greeter {
-  fn greet(other: Named): string {}
+  fn greet(other: Named) string {}
 }
 
 struct Person {
   name: string;
 }
 
-fn (p Person) greet(other: Named): string {
+fn (p Person) greet(other: Named) string {
   return "Hello, " + other.name + " from " + p.name
 }
 

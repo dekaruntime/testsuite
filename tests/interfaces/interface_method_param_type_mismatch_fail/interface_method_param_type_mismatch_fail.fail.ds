@@ -1,5 +1,5 @@
 interface Shouter {
-  fn shout(msg: string): void
+  fn shout(msg: string) void
 }
 struct Bullhorn {}
 fn (b Bullhorn) shout(msg: number) {
