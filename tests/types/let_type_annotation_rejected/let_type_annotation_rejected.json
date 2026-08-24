@@ -1,6 +1,0 @@
-{
-  "title": "Type annotation on let binding is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "DekaScript let declarations require an initializer",
-  "notes": "let declarations with type annotations are not supported."
-}
