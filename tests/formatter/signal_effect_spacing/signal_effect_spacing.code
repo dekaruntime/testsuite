@@ -1,4 +1,0 @@
-const signalPair = deka.ui.signal(0)
-const getCount = signalPair[0]
-const doubled = deka.ui.memo(fn() number { return getCount() * 2 })
-console.log(doubled())

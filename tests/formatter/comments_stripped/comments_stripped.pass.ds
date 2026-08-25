@@ -1,3 +1,0 @@
-// leading comment
-const a=1 /* inline */ + 2
-console.log(a)

@@ -1,2 +1,0 @@
-import { greet } from "./lib/greet.ds";
-console.log(greet());

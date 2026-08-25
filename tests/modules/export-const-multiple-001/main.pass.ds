@@ -1,3 +1,0 @@
-import { PI, E } from "./constants.ds";
-console.log(PI);
-console.log(E);

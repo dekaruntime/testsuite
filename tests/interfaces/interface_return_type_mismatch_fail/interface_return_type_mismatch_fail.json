@@ -1,5 +1,0 @@
-{
-  "title": "Return type mismatch for interface return fails",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Return type mismatch: expected interface Named, got Object<{name: number}>"
-}

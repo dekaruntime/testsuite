@@ -1,6 +1,0 @@
-{
-  "title": "Missing embedded struct field in initializer fails",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Missing required field 'Inner' for struct 'Outer'.",
-  "notes": ""
-}

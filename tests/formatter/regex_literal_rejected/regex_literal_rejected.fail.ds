@@ -1,2 +1,0 @@
-const pattern = /abc/
-console.log(pattern)

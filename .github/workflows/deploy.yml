@@ -35,11 +35,8 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Install Chromium for the browser host
-        run: bunx playwright install chromium
-
-      # Build runs the conformance suite against the native isolate (`deka run`)
-      # and a real browser Worker, so the deployed site includes host drift.
+      # `bun run build` ingests the deka pack (or the last published dump)
+      # then statically exports. No Chromium, no second 620-case run (deka#292).
       - name: Build site
         run: bun run build
 

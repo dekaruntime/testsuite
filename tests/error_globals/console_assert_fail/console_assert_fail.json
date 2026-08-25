@@ -1,6 +1,0 @@
-{
-  "title": "console.assert false fails at runtime",
-  "stage": "run",
-  "notes": "",
-  "expectedDiagnosticContains": "boom"
-}

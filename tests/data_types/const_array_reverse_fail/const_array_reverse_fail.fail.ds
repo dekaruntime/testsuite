@@ -1,3 +1,0 @@
-const arr = [1, 2]
-arr.reverse()
-console.log(arr[0])

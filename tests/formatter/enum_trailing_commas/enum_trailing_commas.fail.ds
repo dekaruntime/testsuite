@@ -1,3 +1,0 @@
-enum Color Red Green Blue
-let c = Color.Green
-console.log(c)

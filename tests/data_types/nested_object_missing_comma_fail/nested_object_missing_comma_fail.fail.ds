@@ -1,2 +1,0 @@
-const nested = { outer: { inner: 42 } inner: 1 }
-console.log(nested.outer.inner)

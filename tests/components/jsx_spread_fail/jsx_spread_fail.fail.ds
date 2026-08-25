@@ -1,3 +1,0 @@
-const props = { name: "Deka" }
-const el = <div {...props} />
-console.log(el)

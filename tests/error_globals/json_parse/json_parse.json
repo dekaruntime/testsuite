@@ -1,6 +1,0 @@
-{
-  "title": "JSON.parse is rejected outside unsafe",
-  "stage": "typecheck",
-  "expectedDiagnosticContains": "JSON is not a DekaScript name",
-  "notes": "Bare `JSON` is not a DekaScript name as of 0.31. The working form is covered by tests/unsafe/unsafe_json_parse_ok."
-}

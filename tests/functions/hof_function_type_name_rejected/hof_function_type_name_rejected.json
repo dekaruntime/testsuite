@@ -1,6 +1,0 @@
-{
-  "title": "JS Function type name is rejected",
-  "stage": "typecheck",
-  "expectedDiagnosticContains": "Unknown type 'Function'",
-  "notes": "Write `fn(number) number`, not `Function`."
-}

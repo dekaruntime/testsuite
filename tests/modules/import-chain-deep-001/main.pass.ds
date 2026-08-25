@@ -1,2 +1,0 @@
-import { value } from "./level1.ds";
-console.log(value);

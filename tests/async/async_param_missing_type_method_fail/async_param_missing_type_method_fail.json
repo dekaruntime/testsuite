@@ -1,5 +1,0 @@
-{
-  "title": "Async method parameter missing type annotation fails",
-  "stage": "parse",
-  "expectedDiagnosticContains": "DekaScript parameters require a type annotation"
-}

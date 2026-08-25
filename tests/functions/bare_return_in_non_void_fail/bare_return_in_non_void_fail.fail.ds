@@ -1,7 +1,0 @@
-fn maybe() number {
-  if (true) {
-    return
-  }
-  return 1
-}
-console.log(maybe())

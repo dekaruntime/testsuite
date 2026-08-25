@@ -306,19 +306,22 @@ export async function loadAndRunAllTests(): Promise<HatsBuildResults> {
 
 /**
  * Load pre-computed conformance results from `public/hats-results.json`.
- * Falls back to running the suite directly when the file is missing (e.g. local
- * `bun run dev` before the first dump).
+ * That file is filled in by `scripts/ingest.mjs` from the deka pack. This
+ * repo does not re-run the suite.
  */
 export async function loadBuildResults(): Promise<HatsBuildResults> {
   const resultsPath = path.join(process.cwd(), 'public', 'hats-results.json')
-  if (fs.existsSync(resultsPath)) {
-    const raw = JSON.parse(fs.readFileSync(resultsPath, 'utf-8'))
-    return {
-      nativeAvailable: Boolean(raw.nativeAvailable),
-      browserAvailable: raw.browserAvailable !== false,
-      version: raw.version ?? 'unknown',
-      categories: raw.categories,
-    }
+  if (!fs.existsSync(resultsPath)) {
+    throw new Error(
+      'public/hats-results.json is missing. Run `bun scripts/ingest.mjs` (deka#292).'
+    )
   }
-  return loadAndRunAllTests()
+  const raw = JSON.parse(fs.readFileSync(resultsPath, 'utf-8'))
+  return {
+    nativeAvailable: Boolean(raw.nativeAvailable),
+    browserAvailable: raw.browserAvailable !== false,
+    version: raw.version ?? 'unknown',
+    wasmSourceCommit: raw.wasmSourceCommit,
+    categories: raw.categories,
+  }
 }

@@ -1,6 +1,0 @@
-{
-  "title": "Reassigning a const binding fails",
-  "stage": "run",
-  "expectedDiagnosticContains": "Attempted to assign to readonly property",
-  "notes": "const declarations create immutable bindings."
-}

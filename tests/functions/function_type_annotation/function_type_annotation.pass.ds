@@ -1,7 +1,0 @@
-fn apply(x: number, f: fn(number) number) number {
-  return f(x)
-}
-fn double(x: number) number {
-  return x * 2
-}
-console.log(apply(3, double))

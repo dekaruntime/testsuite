@@ -1,7 +1,0 @@
-interface Named {
-  name: string
-}
-fn show(n: Named) {
-  console.log(n.age)
-}
-show({ name: "A", age: 1 })

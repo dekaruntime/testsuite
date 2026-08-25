@@ -1,4 +1,0 @@
-fn f(x) number {
-  return x
-}
-console.log(f(1))

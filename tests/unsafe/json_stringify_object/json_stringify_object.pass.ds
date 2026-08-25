@@ -1,2 +1,0 @@
-const r = unsafe { JSON.stringify({ value: 7 }) }
-console.log(match (r) { Ok(v) => v, Err(e) => `err: ${e.message}` })

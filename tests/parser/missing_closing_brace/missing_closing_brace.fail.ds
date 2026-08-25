@@ -1,2 +1,0 @@
-fn f() {
-  console.log(1)

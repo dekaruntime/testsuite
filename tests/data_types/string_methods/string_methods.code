@@ -1,3 +1,0 @@
-const s = "hello"
-console.log(s.toUpperCase())
-console.log(s.length)

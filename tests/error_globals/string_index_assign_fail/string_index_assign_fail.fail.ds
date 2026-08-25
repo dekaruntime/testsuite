@@ -1,3 +1,0 @@
-const s = "hello"
-s[0] = "H"
-console.log(s)

@@ -1,5 +1,0 @@
-{
-  "title": "Undefined JSX tag variable fails",
-  "stage": "run",
-  "notes": "Using an undefined variable as a JSX tag should fail at runtime."
-}
