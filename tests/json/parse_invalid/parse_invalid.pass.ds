@@ -1,5 +1,0 @@
-import { parse } from "json"
-console.log(match (parse("not json")) {
-  Ok(v) => "ok",
-  Err(e) => "err"
-})

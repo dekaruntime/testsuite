@@ -1,2 +1,0 @@
-console.log(Color.Red.__case)
-enum Color { Red Green }

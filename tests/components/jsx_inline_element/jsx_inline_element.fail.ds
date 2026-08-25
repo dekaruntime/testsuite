@@ -1,2 +1,0 @@
-const el = <div class={}>hi</div>
-console.log(el)

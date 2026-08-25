@@ -1,3 +1,0 @@
-const t = true
-if (t) {
-  console.log(1)

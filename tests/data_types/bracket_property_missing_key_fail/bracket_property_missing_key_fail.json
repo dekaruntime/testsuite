@@ -1,5 +1,0 @@
-{
-  "title": "Bracket access with missing key returns undefined and fails on property access",
-  "stage": "run",
-  "notes": ""
-}

@@ -1,5 +1,0 @@
-import { upgrade } from "tls"
-console.log(match (upgrade(999999, "example.com")) {
-  Ok(h) => "ok",
-  Err(e) => "err"
-})

@@ -1,3 +1,0 @@
-struct A{b:int}
-let a=A{b:1}
-console.log(a?.b)

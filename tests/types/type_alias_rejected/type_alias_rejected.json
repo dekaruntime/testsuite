@@ -1,6 +1,0 @@
-{
-  "title": "Type aliases are rejected",
-  "stage": "parse",
-  "notes": "",
-  "expectedDiagnosticContains": "Expected '='"
-}

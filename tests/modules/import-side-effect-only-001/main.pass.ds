@@ -1,2 +1,0 @@
-import "./logger.ds";
-console.log("after import");

@@ -1,2 +1,0 @@
-const s = "hello"
-console.log(s.find("e"))

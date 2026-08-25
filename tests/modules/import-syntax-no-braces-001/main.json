@@ -1,5 +1,0 @@
-{
-  "title": "import without braces is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Expected '{' after import"
-}

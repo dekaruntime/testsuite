@@ -5,10 +5,12 @@
   "scripts": {
     "copy:monaco": "copy-deka-monaco",
     "dev": "next dev",
-    "build": "bun run copy:monaco && bun scripts/dump-results.mjs && next build",
+    "ingest": "bun scripts/ingest.mjs",
+    "build": "bun run copy:monaco && bun scripts/ingest.mjs && next build",
     "deploy": "wrangler deploy",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "bun test lib"
   },
   "dependencies": {
     "@dekaruntime/web-ide-kit": "^0.1.8",

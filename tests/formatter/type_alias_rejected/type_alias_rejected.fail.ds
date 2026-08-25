@@ -1,3 +1,0 @@
-type ID = number
-const x: ID = 5
-console.log(x)

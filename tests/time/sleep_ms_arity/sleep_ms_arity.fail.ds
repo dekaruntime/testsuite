@@ -1,3 +1,0 @@
-import { sleep_ms } from "time"
-const r = sleep_ms()
-console.log(r)

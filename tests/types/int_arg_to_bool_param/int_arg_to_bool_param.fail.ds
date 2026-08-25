@@ -1,4 +1,0 @@
-fn f(x: boolean): boolean {
-  return x
-}
-console.log(f(1))

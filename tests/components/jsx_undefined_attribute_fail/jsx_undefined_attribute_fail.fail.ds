@@ -1,2 +1,0 @@
-const el = <div {missing}="x" />
-console.log(el)

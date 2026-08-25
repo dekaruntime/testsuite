@@ -1,6 +1,0 @@
-import { set_deadline } from "tcp"
-
-console.log(match (set_deadline(0, 10)) {
-  Ok(v) => "ok",
-  Err(e) => "err"
-})

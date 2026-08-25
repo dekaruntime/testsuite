@@ -1,6 +1,0 @@
-{
-  "title": "Type annotation on const binding is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Expected '='",
-  "notes": "DekaScript const declarations do not support explicit type annotations."
-}

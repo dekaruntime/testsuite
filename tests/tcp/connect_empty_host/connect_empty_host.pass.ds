@@ -1,5 +1,0 @@
-import { connect } from "tcp"
-console.log(match (connect("", 80)) {
-  Ok(h) => "ok",
-  Err(e) => "err"
-})

@@ -1,3 +1,0 @@
-const greeting = "Hello, "
-const name = "Deka"
-console.log(greeting + name)

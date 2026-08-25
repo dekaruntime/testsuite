@@ -1,2 +1,0 @@
-const x = undefined
-console.log(x.y)

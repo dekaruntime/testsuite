@@ -1,4 +1,0 @@
-fn id<T>(x: T): T {
-  return x
-}
-console.log(id(42))

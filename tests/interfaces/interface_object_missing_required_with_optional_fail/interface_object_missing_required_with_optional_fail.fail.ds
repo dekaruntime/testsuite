@@ -1,8 +1,0 @@
-interface Card {
-  title: string
-  subtitle?: string
-}
-fn show(c: Card) {
-  console.log(c.title)
-}
-show({ subtitle: "World" })

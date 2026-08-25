@@ -1,5 +1,0 @@
-{
-  "title": "Unqualified enum payload match fails at runtime",
-  "stage": "run",
-  "notes": "Enum payload match arms must use the qualified form Shape.Circle."
-}

@@ -1,5 +1,0 @@
-import { get } from "http"
-console.log(match (get("not a url")) {
-  Ok(v) => "ok",
-  Err(e) => "err"
-})

@@ -1,6 +1,0 @@
-{
-  "title": "Option annotation on variable is rejected",
-  "stage": "parse",
-  "notes": "",
-  "expectedDiagnosticContains": "Expected '='"
-}

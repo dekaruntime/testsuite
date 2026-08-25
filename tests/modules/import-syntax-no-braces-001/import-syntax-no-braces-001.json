@@ -1,5 +1,0 @@
-{
-  "title": "import-syntax-no-braces-001",
-  "expectedDiagnosticContains": "Expected '{' after import",
-  "stage": "parse"
-}

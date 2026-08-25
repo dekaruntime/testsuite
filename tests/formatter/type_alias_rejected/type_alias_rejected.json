@@ -1,6 +1,0 @@
-{
-  "title": "Type alias declaration is rejected",
-  "stage": "parse",
-  "notes": "DekaScript does not support type aliases; the type keyword is a parse error.",
-  "expectedDiagnosticContains": "Expected '='"
-}

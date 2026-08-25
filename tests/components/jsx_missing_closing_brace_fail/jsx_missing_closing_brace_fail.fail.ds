@@ -1,4 +1,0 @@
-const ui = globalThis.deka.ui
-const name = "Deka"
-const html = ui.renderToString(<p>Hello {name</p>)
-console.log(html.html)

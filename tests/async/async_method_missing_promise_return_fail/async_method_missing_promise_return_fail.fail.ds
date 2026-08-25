@@ -1,9 +1,0 @@
-struct Counter {
-  count: number
-}
-
-async fn (c Counter) fetch(): number {
-  return c.count
-}
-
-console.log(await Counter { count: 1 }.fetch())

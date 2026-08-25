@@ -1,6 +1,0 @@
-{
-  "title": "Type mismatch in binding fails",
-  "stage": "parse",
-  "notes": "",
-  "expectedDiagnosticContains": "Expected '='"
-}

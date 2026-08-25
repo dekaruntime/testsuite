@@ -1,5 +1,0 @@
-import { stringify } from "json"
-console.log(match (stringify({})) {
-  Ok(v) => v,
-  Err(e) => "fail"
-})

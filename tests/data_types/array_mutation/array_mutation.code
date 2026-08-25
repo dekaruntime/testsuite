@@ -1,3 +1,0 @@
-let items = [1, 2, 3]
-items[0] = 9
-console.log(items[0])

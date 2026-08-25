@@ -1,5 +1,0 @@
-{
-  "title": "Empty return in an async Promise<number> function fails",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Return type mismatch: expected number, got null"
-}

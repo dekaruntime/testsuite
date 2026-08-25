@@ -1,2 +1,0 @@
-struct S{x:int y:int}
-console.log(1)

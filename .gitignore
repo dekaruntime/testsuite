@@ -48,3 +48,6 @@ next-env.d.ts
 # hats build artifacts
 /.cache/
 /native-run-*/
+
+# Fixtures live in dekaruntime/deka tests/testsuite. Ingest reconstructs this.
+/tests/

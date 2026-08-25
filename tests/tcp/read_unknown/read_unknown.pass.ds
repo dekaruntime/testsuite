@@ -1,6 +1,0 @@
-import { read } from "tcp"
-
-console.log(match (read(0, 16)) {
-  Ok(v) => "ok",
-  Err(e) => "err"
-})

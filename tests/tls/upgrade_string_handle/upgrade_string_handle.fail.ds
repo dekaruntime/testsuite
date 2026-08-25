@@ -1,3 +1,0 @@
-import { upgrade } from "tls"
-const r = upgrade("h", "localhost")
-console.log(r)

@@ -116,6 +116,12 @@ export async function prepareNativeCli(version: string): Promise<string | null> 
   return binaryPath
 }
 
+export function nativeCliVersion(cliPath: string): string | undefined {
+  // `deka [version x.y.z]` is written to stderr, same as preflight.mjs.
+  const r = spawnSync(cliPath, ['--version'], { encoding: 'utf-8', timeout: 10_000 })
+  return `${r.stdout ?? ''}${r.stderr ?? ''}`.match(/(\d+\.\d+\.\d+)/)?.[1]
+}
+
 function parseNativeDiagnostics(stderr: string): NativeRunResult['diagnostics'] {
   const diagnostics: NativeRunResult['diagnostics'] = []
   const lines = stderr.split('\n')

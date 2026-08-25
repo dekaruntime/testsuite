@@ -1,5 +1,0 @@
-async fn work(): Promise<void> {
-  console.log("done")
-}
-
-await work()

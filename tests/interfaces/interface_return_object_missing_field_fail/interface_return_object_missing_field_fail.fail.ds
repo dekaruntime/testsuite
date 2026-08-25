@@ -1,7 +1,0 @@
-interface Named {
-  name: string
-}
-fn makeNamed(): Named {
-  return {}
-}
-console.log(makeNamed().name)

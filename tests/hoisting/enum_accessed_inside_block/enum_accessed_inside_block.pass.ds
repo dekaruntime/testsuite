@@ -1,2 +1,0 @@
-enum State { On Off }
-if (true) { console.log(State.On.__case) }

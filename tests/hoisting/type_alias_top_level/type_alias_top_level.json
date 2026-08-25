@@ -1,6 +1,0 @@
-{
-  "title": "type aliases are allowed at the top level.",
-  "stage": "parse",
-  "notes": "",
-  "expectedDiagnosticContains": "Expected '='"
-}

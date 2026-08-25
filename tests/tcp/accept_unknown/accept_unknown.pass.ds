@@ -1,6 +1,0 @@
-import { accept } from "tcp"
-
-console.log(match (accept(0)) {
-  Ok(v) => "ok",
-  Err(e) => "err"
-})

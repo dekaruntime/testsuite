@@ -1,6 +1,0 @@
-{
-  "title": "Object shorthand property syntax is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Expected ':' after object key",
-  "notes": ""
-}

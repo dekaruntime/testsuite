@@ -1,6 +1,0 @@
-{
-  "title": "Hoisted enum is accessible inside a block.",
-  "stage": "parse",
-  "notes": "",
-  "expectedDiagnosticContains": "Unknown enum field 'State::On::__case'"
-}

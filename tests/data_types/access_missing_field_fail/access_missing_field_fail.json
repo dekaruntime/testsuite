@@ -1,6 +1,0 @@
-{
-  "title": "Accessing a missing struct field fails",
-  "stage": "parse",
-  "notes": "",
-  "expectedDiagnosticContains": "Unknown struct field 'Point::y'"
-}
