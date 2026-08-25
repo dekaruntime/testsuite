@@ -29,6 +29,10 @@ tests/testsuite/<category>/<name>/
 Then `./run.sh --filter <name>` in the deka checkout. After the next runtime
 release, this site ingests the new tree + dump.
 
+Native-only stdlib package categories (`crypto`, `jwt`, `json`, `fs`, `tcp`, `tls`,
+`http`, `time`) are listed in `lib/recorded-only.ts` so they show as **CACHED RESULTS**
+once the dump includes them. Fixtures for those live in deka, not here.
+
 ## Local
 
 ```sh
