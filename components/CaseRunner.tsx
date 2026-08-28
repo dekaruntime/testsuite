@@ -449,7 +449,10 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
             CACHED RESULTS
           </p>
           <p className="text-[11px] text-amber-900/80 dark:text-amber-200/80">
-            Not live — recorded from the native isolate at dump. The editor is read-only; this page is not frozen or broken.
+            Not live — recorded from dump. The editor is read-only; this page is not frozen or broken.
+            {test.category === 'ADHOC'
+              ? ' ADHOC squares show the commands that ran and their stdout.'
+              : ''}
           </p>
         </div>
       ) : null}
@@ -470,7 +473,11 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
             <h1 className="text-lg font-bold">{test.title}</h1>
             <p className="text-xs text-muted-foreground">
               {test.category} · expected {test.status} at {test.stage}
-              {recordedOnly ? ` · ${cached?.host ?? 'native'} isolate recording` : ''}
+              {recordedOnly
+                ? test.category === 'ADHOC'
+                  ? ' · ADHOC cached commands + stdout'
+                  : ` · ${cached?.host ?? 'native'} isolate recording`
+                : ''}
             </p>
           </div>
         </div>

@@ -12,6 +12,7 @@ import type { HatsHost } from './tests'
  * Everything else keeps the live playground.
  */
 export const RECORDED_ONLY_CATEGORIES = new Set<string>([
+  'ADHOC',
   'packages',
   'crypto',
   'jwt',
