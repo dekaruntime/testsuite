@@ -58,17 +58,6 @@ function determineStage(js: string | undefined, diagnostics: CompilerDiagnostic[
   return 'run'
 }
 
-function findDumpRecord(
-  categories: HatsCategoryWithResults[],
-  slug: string
-): HatsTestWithBuildResult | undefined {
-  for (const group of categories) {
-    const match = group.tests.find((item) => item.slug === slug)
-    if (match) return match
-  }
-  return undefined
-}
-
 function pickCachedResult(record: HatsTestWithBuildResult): { host: 'native' | 'browser'; result: RuntimeResult } {
   if (!record.nativeResult.skipped) return { host: 'native', result: record.nativeResult }
   if (!record.wasmResult.skipped) return { host: 'browser', result: record.wasmResult }
@@ -97,8 +86,15 @@ function matchesExpectation(test: HatsTest, result: RunResult, stage: 'parse' | 
   return true
 }
 
-export function CaseRunner({ test, categories }: { test: HatsTest; categories: HatsCategoryWithResults[] }) {
-  const dumpRecord = useMemo(() => findDumpRecord(categories, test.slug), [categories, test.slug])
+export function CaseRunner({
+  test,
+  dumpRecord,
+  nextSlug,
+}: {
+  test: HatsTest
+  dumpRecord?: HatsTestWithBuildResult
+  nextSlug?: string
+}) {
   const recordedOnly = isRecordedOnly(test)
   const cached = useMemo(
     () => (dumpRecord ? pickCachedResult(dumpRecord) : null),
@@ -107,6 +103,23 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
 
   const [source, setSource] = useState(test.source)
   const [contentsOpen, setContentsOpen] = useState(false)
+
+  // Fetched the first time the contents panel is opened, not shipped in the
+  // page. It is one public asset the browser then caches across navigations.
+  const [contents, setContents] = useState<HatsCategoryWithResults[] | null>(null)
+  useEffect(() => {
+    if (!contentsOpen || contents) return
+    let cancelled = false
+    fetch('/hats-results.json')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.categories) setContents(data.categories)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [contentsOpen, contents])
   const [isRunning, setIsRunning] = useState(false)
   const [output, setOutput] = useState<{ stdout: string; stderr: string; error?: string }>({
     stdout: '',
@@ -389,14 +402,6 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
 
   const stage = determineStage(compileState.js, compileState.diagnostics ?? [])
 
-  const allTestSlugs = useMemo(
-    () => categories.flatMap((group) => group.tests.map((t) => t.slug)),
-    [categories]
-  )
-  const currentIndex = allTestSlugs.indexOf(test.slug)
-  const nextSlug = currentIndex >= 0 && currentIndex < allTestSlugs.length - 1
-    ? allTestSlugs[currentIndex + 1]
-    : undefined
 
   const result: RunResult = {
     ok: compileState.error === undefined && output.error === undefined && compileState.js !== undefined,
@@ -492,7 +497,7 @@ export function CaseRunner({ test, categories }: { test: HatsTest; categories: H
         <aside className="flex min-h-0 flex-col border-r border-border bg-card">
           {contentsOpen ? (
             <HatsContents
-              categories={categories}
+              categories={contents ?? []}
               currentSlug={test.slug}
               onSelect={() => setContentsOpen(false)}
               onClose={() => setContentsOpen(false)}
