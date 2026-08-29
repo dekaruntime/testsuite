@@ -233,7 +233,8 @@ export function CaseRunner({
           return
         }
 
-        const compileResult = await compileDeka(sourceToCompile, `${test.slug}.ds`, { moduleBase: '/modules' })
+        const moduleBase = typeof window !== 'undefined' ? `${window.location.origin}/modules` : '/modules'
+        const compileResult = await compileDeka(sourceToCompile, `${test.slug}.ds`, { moduleBase })
         if (!isCurrentSource()) return
 
         if (!compileResult.ok || !compileResult.js) {
