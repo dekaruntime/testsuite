@@ -142,6 +142,7 @@ export function CaseRunner({
   const latestSourceRef = useRef(source)
   const sourceVersionRef = useRef(0)
   const isMountedRef = useRef(true)
+  const moduleBase = typeof window !== 'undefined' ? `${window.location.origin}/modules` : '/modules'
 
   latestSourceRef.current = source
 
@@ -215,7 +216,7 @@ export function CaseRunner({
             return
           }
 
-          const strippedJs = formatRawJs(entryJs)
+          const strippedJs = formatRawJs(entryJs, { moduleBase })
           const formatResult = await formatDekaJs(strippedJs)
           setCompileState({
             js: entryJs,
@@ -233,7 +234,6 @@ export function CaseRunner({
           return
         }
 
-        const moduleBase = typeof window !== 'undefined' ? `${window.location.origin}/modules` : '/modules'
         const compileResult = await compileDeka(sourceToCompile, `${test.slug}.ds`, { moduleBase })
         if (!isCurrentSource()) return
 
@@ -258,7 +258,7 @@ export function CaseRunner({
           return
         }
 
-        const strippedJs = formatRawJs(compileResult.js)
+        const strippedJs = formatRawJs(compileResult.js, { moduleBase })
         const formatResult = await formatDekaJs(strippedJs)
         setCompileState({
           js: compileResult.js,
@@ -351,7 +351,7 @@ export function CaseRunner({
     if (recordedOnly) {
       if (cached) {
         const emitted = cached.result.emittedJs
-        const displayJs = emitted ? formatRawJs(emitted) : undefined
+        const displayJs = emitted ? formatRawJs(emitted, { moduleBase }) : undefined
         setOutput({
           stdout: cached.result.stdout,
           stderr: cached.result.stderr,
