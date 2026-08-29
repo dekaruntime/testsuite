@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "copy:monaco": "copy-deka-monaco",
+    "copy:monaco": "rm -rf public/monaco-editor && mkdir -p public/monaco-editor/min && cp -R node_modules/monaco-editor/min/vs public/monaco-editor/min/vs && node scripts/verify-monaco-assets.mjs",
     "dev": "next dev",
     "ingest": "bun scripts/ingest.mjs",
     "build": "bun run copy:monaco && bun scripts/ingest.mjs && next build",
@@ -18,7 +18,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.33.0",
-    "monaco-editor": "^0.56.0",
+    "monaco-editor": "0.52.2",
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
