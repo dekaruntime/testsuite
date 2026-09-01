@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import type { HatsCategoryWithResults, HatsTestWithBuildResult } from '@/lib/build-tests'
 import type { HatsOverallStatus } from '@/lib/overall-status'
+import type { HatsHost } from '@/lib/tests'
 import { isRecordedOnly } from '@/lib/recorded-only'
 
 interface HatsGridProps {
@@ -53,11 +54,42 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
       .filter((group) => group.tests.length > 0)
   }, [categories, normalizedQuery])
 
-  const total = categories.flatMap((c) => c.tests).length
-  const passing = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'pass').length
-  const failing = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'fail').length
-  const divergent = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'divergent').length
-  const skipped = categories.flatMap((c) => c.tests).filter((t) => t.overallStatus === 'skip').length
+  const allTests = useMemo(() => categories.flatMap((c) => c.tests), [categories])
+  const total = allTests.length
+
+  // Report each host on its own terms. The previous single line collapsed
+  // native and wasm into one pass/fail/drift triple, which made a formatter
+  // difference on a test both hosts got right look identical to a genuine
+  // compiler divergence -- and hid the native result entirely.
+  const stats = useMemo(() => {
+    const declares = (t: (typeof allTests)[number], host: HatsHost) =>
+      (t.hosts ?? []).includes(host)
+
+    const nativeRun = allTests.filter((t) => declares(t, 'native'))
+    const nativePassing = nativeRun.filter((t) => t.nativeMatches).length
+
+    const wasmRun = allTests.filter((t) => declares(t, 'browser'))
+    const wasmPassing = wasmRun.filter((t) => t.wasmMatches).length
+
+    // Drift is only meaningful where a test declares BOTH hosts: it is the
+    // count of tests the two runtimes disagree about.
+    const dual = allTests.filter((t) => declares(t, 'native') && declares(t, 'browser'))
+    const drift = dual.filter((t) => t.nativeMatches !== t.wasmMatches).length
+
+    return {
+      native: {
+        passing: nativePassing,
+        failing: nativeRun.length - nativePassing,
+        skipped: total - nativeRun.length,
+      },
+      wasm: {
+        passing: wasmPassing,
+        failing: wasmRun.length - wasmPassing,
+        drift,
+      },
+    }
+  }, [allTests, total])
+
   const visibleCount = filteredCategories.flatMap((c) => c.tests).length
 
   return (
@@ -72,16 +104,27 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
           <h1 className="text-xl font-bold">deka test suite</h1>
         </div>
         <div className="flex items-center gap-4">
-          <p className="text-xs text-muted-foreground">
-            deka v{version} · {passing} passing · {failing} failing · {divergent} drift
-            {skipped > 0 ? ` · ${skipped} skipped` : ''} · {total} tests
-            {!nativeAvailable && (
-              <span className="ml-2 text-amber-500">native runtime unavailable</span>
-            )}
-            {!browserAvailable && (
-              <span className="ml-2 text-amber-500">browser runtime unavailable</span>
-            )}
-          </p>
+          <div className="text-xs text-muted-foreground">
+            <p>
+              deka v{version}
+              {!nativeAvailable && (
+                <span className="ml-2 text-amber-500">native runtime unavailable</span>
+              )}
+              {!browserAvailable && (
+                <span className="ml-2 text-amber-500">browser runtime unavailable</span>
+              )}
+            </p>
+            <p className="tabular-nums">
+              <span className="font-medium text-foreground">native:</span>{' '}
+              {stats.native.passing} passing · {stats.native.failing} failing ·{' '}
+              {stats.native.skipped} skipped · {total} tests
+            </p>
+            <p className="tabular-nums">
+              <span className="font-medium text-foreground">wasm:</span>{' '}
+              {stats.wasm.passing} passing · {stats.wasm.failing} failing ·{' '}
+              {stats.wasm.drift} drift · {total} tests
+            </p>
+          </div>
           <input
             type="search"
             value={query}
