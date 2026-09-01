@@ -7,6 +7,8 @@ import { HatsContents } from './HatsContents'
 import { ResizableSplitter } from './ResizableSplitter'
 import { Button } from '@/components/ui/button'
 import { EditorPanel, TourOutputPanel } from '@dekaruntime/web-ide-kit/ui'
+import type { OutputPane } from '@dekaruntime/web-ide-kit/ui'
+import { CodeDiff } from '@/components/CodeDiff'
 import {
   compileDeka,
   runDekaJs,
@@ -401,6 +403,30 @@ export function CaseRunner({
     }
   }, [])
 
+  // A case is reported as divergent whenever the formatter's output differs
+  // from the fixture source, even when both hosts compile and run it correctly
+  // -- which is the single most common cause of "drift". Rendering that as two
+  // code blocks left the reader to spot a one-character change by eye.
+  //
+  // `source` is already the formatted text: the run path calls formatDekaDs and
+  // setSource() before compiling, so this compares like with like.
+  const diffPanes: OutputPane[] = useMemo(() => {
+    const expected = test.expectedCode
+    if (expected === undefined || expected === source) return []
+    return [
+      {
+        key: 'diff',
+        label: 'Diff',
+        hint: 'fixture vs formatted',
+        content: (
+          <div className="p-3">
+            <CodeDiff expected={expected} actual={source} />
+          </div>
+        ),
+      },
+    ]
+  }, [test.expectedCode, source])
+
   const stage = determineStage(compileState.js, compileState.diagnostics ?? [])
 
 
@@ -665,6 +691,7 @@ export function CaseRunner({
             ) : null}
             <div className={recordedOnly ? 'h-full pt-7' : 'h-full'}>
               <TourOutputPanel
+                extraPanes={diffPanes}
                 stdout={output.stdout}
                 stderr={output.stderr}
                 error={output.error}
