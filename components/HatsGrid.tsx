@@ -106,7 +106,14 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
         <div className="flex items-center gap-4">
           <div className="text-xs text-muted-foreground">
             <p>
-              deka v{version}
+              <a
+                href="https://deka.gg/install"
+                target="_blank"
+                rel="noreferrer"
+                className="underline decoration-dotted underline-offset-2 hover:text-foreground"
+              >
+                deka v{version}
+              </a>
               {!nativeAvailable && (
                 <span className="ml-2 text-amber-500">native runtime unavailable</span>
               )}
