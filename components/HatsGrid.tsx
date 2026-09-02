@@ -6,6 +6,7 @@ import type { HatsCategoryWithResults, HatsGroups, HatsTestWithBuildResult } fro
 import type { HatsOverallStatus } from '@/lib/overall-status'
 import type { HatsHost } from '@/lib/tests'
 import { isRecordedOnly } from '@/lib/recorded-only'
+import { GROUP_ORDER, groupOf } from '@/lib/test-group'
 
 interface HatsGridProps {
   categories: HatsCategoryWithResults[]
@@ -100,15 +101,17 @@ export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable
             </p>
             {groups ? (
               <>
-                <p className="tabular-nums">
-                  <span className="font-medium text-foreground">native-only:</span>{' '}
-                  {groups['native-only'].pass} pass · {groups['native-only'].fail} fail ·{' '}
-                  {groups['native-only'].total} tests
-                </p>
+                {/* shared first: it is the largest group and the only one
+                    where divergence means anything. */}
                 <p className="tabular-nums">
                   <span className="font-medium text-foreground">shared:</span>{' '}
                   {groups.shared.pass} pass · {groups.shared.fail} fail ·{' '}
                   {groups.shared.diverge} diverge · {groups.shared.total} tests
+                </p>
+                <p className="tabular-nums">
+                  <span className="font-medium text-foreground">native-only:</span>{' '}
+                  {groups['native-only'].pass} pass · {groups['native-only'].fail} fail ·{' '}
+                  {groups['native-only'].total} tests
                 </p>
                 <p className="tabular-nums">
                   <span className="font-medium text-foreground">browser-only:</span>{' '}
@@ -145,29 +148,49 @@ export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-1">
-          {filteredCategories.map((group) => (
-            <span key={group.name} className="contents">
-              <span className="mr-1 inline-flex items-center text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                {group.name}
-              </span>
-              {group.tests.map((test) => {
-                const cached = isRecordedOnly(test)
-                return (
-                  <Link
-                    key={test.slug}
-                    href={`/case/${test.slug}`}
-                    title={`${test.title}\n${test.category} · wasm: ${test.wasmMatches ? 'match' : 'mismatch'} · native: ${test.nativeMatches ? 'match' : 'mismatch'}${cached ? '\nCACHED RESULTS — not live in the browser' : ''}`}
-                    className={`inline-flex size-4 rounded-sm transition-opacity hover:opacity-70 ${statusColor(test.overallStatus)}${cached ? ' ring-1 ring-amber-500/70 ring-offset-1 ring-offset-background' : ''}`}
-                  />
-                )
-              })}
-            </span>
-          ))}
-          {filteredCategories.length === 0 && (
-            <p className="text-muted-foreground">No tests match your filter.</p>
-          )}
-        </div>
+        {GROUP_ORDER.map((groupName) => {
+          const inGroup = filteredCategories
+            .map((category) => ({
+              ...category,
+              tests: category.tests.filter((test) => groupOf(test) === groupName),
+            }))
+            .filter((category) => category.tests.length > 0)
+          if (inGroup.length === 0) return null
+          const count = inGroup.reduce((n, category) => n + category.tests.length, 0)
+          return (
+            <section key={groupName} className="mb-8">
+              <h2 className="mb-3 text-2xl font-bold uppercase tracking-wide">
+                {groupName}
+                <span className="ml-2 text-sm font-normal tabular-nums text-muted-foreground">
+                  {count} tests
+                </span>
+              </h2>
+              <div className="flex flex-wrap items-center gap-1">
+                {inGroup.map((category) => (
+                  <span key={category.name} className="contents">
+                    <span className="mr-1 inline-flex items-center text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      {category.name}
+                    </span>
+                    {category.tests.map((test) => {
+                      const cached = isRecordedOnly(test)
+                      return (
+                        <Link
+                          key={test.slug}
+                          href={`/case/${test.slug}`}
+                          title={`${test.title}\n${test.category} · wasm: ${test.wasmMatches ? 'match' : 'mismatch'} · native: ${test.nativeMatches ? 'match' : 'mismatch'}${cached ? '\nCACHED RESULTS — not live in the browser' : ''}`}
+                          className={`inline-flex size-4 rounded-sm transition-opacity hover:opacity-70 ${statusColor(test.overallStatus)}${cached ? ' ring-1 ring-amber-500/70 ring-offset-1 ring-offset-background' : ''}`}
+                        />
+                      )
+                    })}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )
+        })}
+        {filteredCategories.length === 0 && (
+          <p className="text-muted-foreground">No tests match your filter.</p>
+        )}
       </main>
     </div>
   )

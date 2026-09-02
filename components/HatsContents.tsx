@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { statusColor } from '@/components/HatsGrid'
 import type { HatsCategoryWithResults } from '@/lib/build-tests'
 import { isRecordedOnly } from '@/lib/recorded-only'
+import { GROUP_ORDER, groupOf } from '@/lib/test-group'
 
 interface HatsContentsProps {
   categories: HatsCategoryWithResults[]
@@ -74,7 +75,15 @@ export function HatsContents({ categories, currentSlug, onSelect, onClose }: Hat
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
         <div className="space-y-5">
-          {filteredCategories.map((group) => (
+          {GROUP_ORDER.flatMap((groupName) =>
+            filteredCategories
+              .map((category) => ({
+                ...category,
+                name: `${groupName.toUpperCase()} / ${category.name}`,
+                tests: category.tests.filter((test) => groupOf(test) === groupName),
+              }))
+              .filter((category) => category.tests.length > 0)
+          ).map((group) => (
             <div key={group.name}>
               <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {group.name}
