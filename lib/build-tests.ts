@@ -204,6 +204,8 @@ export interface HatsBuildResults {
   groups?: HatsGroups
   /** Latest released version, for staleness. null when undeterminable. */
   latestVersion?: string | null
+  /** How far main has moved past the measured compiler. null when unknown. */
+  commitsBehindMain?: number | null
   categories: HatsCategoryWithResults[]
 }
 
@@ -343,6 +345,38 @@ async function latestReleasedVersion(): Promise<string | null> {
   }
 }
 
+/**
+ * How many commits main is ahead of the compiler these results were measured
+ * with, or null when it cannot be determined.
+ *
+ * Comparing versions is not enough. The measured compiler and the latest
+ * release are both `0.39.0` while main sits 35 commits ahead of both, so the
+ * version check stays silent and the page implies the numbers describe
+ * current main when they describe a release (testsuite#65).
+ *
+ * `dekaruntime/deka` is private, so this needs a token and is skipped without
+ * one. Same contract as `latestReleasedVersion`: build-time only, never
+ * throws, and the page degrades to showing provenance without a distance.
+ */
+async function commitsBehindMain(measuredCommit?: string): Promise<number | null> {
+  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN
+  if (!token || !measuredCommit) return null
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/dekaruntime/deka/compare/${measuredCommit}...main`,
+      {
+        headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' },
+        signal: AbortSignal.timeout(8000),
+      }
+    )
+    if (!res.ok) return null
+    const json = (await res.json()) as { ahead_by?: number }
+    return typeof json.ahead_by === 'number' ? json.ahead_by : null
+  } catch {
+    return null
+  }
+}
+
 export async function loadBuildResults(): Promise<HatsBuildResults> {
   const resultsPath = path.join(process.cwd(), 'public', 'hats-results.json')
   if (!fs.existsSync(resultsPath)) {
@@ -363,6 +397,7 @@ export async function loadBuildResults(): Promise<HatsBuildResults> {
     // one unless the page is told. Sami's rule is that the site must never
     // show a previous run's metrics as if they were current.
     latestVersion: await latestReleasedVersion(),
+    commitsBehindMain: await commitsBehindMain(raw.wasmSourceCommit),
     categories: raw.categories,
   }
 }
