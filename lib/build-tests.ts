@@ -46,6 +46,10 @@ export interface HatsTestWithBuildResult extends HatsTest {
   nativeResult: RuntimeResult
   wasmMatches: boolean
   nativeMatches: boolean
+  /** What actually happened. Prefer this (deka#368). */
+  verdict?: HatsOverallStatus
+  /** @deprecated ambiguous -- `status` is the fixture's EXPECTATION, this is
+   *  the outcome. Kept while packs built before deka#533 are still served. */
   overallStatus: HatsOverallStatus
 }
 
@@ -198,6 +202,8 @@ export interface HatsBuildResults {
   version: string
   wasmSourceCommit?: string
   groups?: HatsGroups
+  /** Latest released version, for staleness. null when undeterminable. */
+  latestVersion?: string | null
   categories: HatsCategoryWithResults[]
 }
 
@@ -317,6 +323,26 @@ export async function loadAndRunAllTests(): Promise<HatsBuildResults> {
  * That file is filled in by `scripts/ingest.mjs` from the deka pack. This
  * repo does not re-run the suite.
  */
+/**
+ * The version currently released, or null if it cannot be determined.
+ *
+ * Build-time only, and a failure here must never fail the build -- the page
+ * degrades to showing the pack's version with no staleness note, which is
+ * exactly what it did before deka#368.
+ */
+async function latestReleasedVersion(): Promise<string | null> {
+  try {
+    const res = await fetch('https://releases.deka.gg/latest.json', {
+      signal: AbortSignal.timeout(5000),
+    })
+    if (!res.ok) return null
+    const json = (await res.json()) as { version?: string }
+    return json.version ?? null
+  } catch {
+    return null
+  }
+}
+
 export async function loadBuildResults(): Promise<HatsBuildResults> {
   const resultsPath = path.join(process.cwd(), 'public', 'hats-results.json')
   if (!fs.existsSync(resultsPath)) {
@@ -333,6 +359,10 @@ export async function loadBuildResults(): Promise<HatsBuildResults> {
     // The pack owns the summary. The site renders it and never recomputes it --
     // one producer owns every number (deka#503, TESTING.md).
     groups: raw.groups,
+    // deka#368: a pack three releases old renders identically to a current
+    // one unless the page is told. Sami's rule is that the site must never
+    // show a previous run's metrics as if they were current.
+    latestVersion: await latestReleasedVersion(),
     categories: raw.categories,
   }
 }

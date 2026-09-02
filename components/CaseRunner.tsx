@@ -24,6 +24,7 @@ import { setLspWorkerPath } from '@dekaruntime/web-ide-kit/editor'
 import type { HatsTest } from '@/lib/tests'
 import type { HatsCategoryWithResults, HatsTestWithBuildResult, RuntimeResult } from '@/lib/build-tests'
 import { isRecordedOnly } from '@/lib/recorded-only'
+import { verdictOf } from '@/lib/overall-status'
 
 setCompilerArtifactPath('https://wasm.deka.gg/latest/deka-compiler-artifact.json')
 setLspWorkerPath('/deka-diagnostics-worker.js')
@@ -440,7 +441,7 @@ export function CaseRunner({
   }
 
   const expectationMet = recordedOnly && dumpRecord
-    ? dumpRecord.overallStatus === 'pass'
+    ? verdictOf(dumpRecord) === 'pass'
     : matchesExpectation(test, result, stage, source)
 
   const handleLeftResize = useCallback(

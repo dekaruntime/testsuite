@@ -6,6 +6,7 @@ import type { HatsCategoryWithResults, HatsGroups, HatsTestWithBuildResult } fro
 import type { HatsOverallStatus } from '@/lib/overall-status'
 import type { HatsHost } from '@/lib/tests'
 import { isRecordedOnly } from '@/lib/recorded-only'
+import { verdictOf } from '@/lib/overall-status'
 import { GROUP_ORDER, groupOf } from '@/lib/test-group'
 
 interface HatsGridProps {
@@ -14,6 +15,7 @@ interface HatsGridProps {
   nativeAvailable: boolean
   browserAvailable?: boolean
   version: string
+  latestVersion?: string | null
 }
 
 export function statusColor(status: HatsOverallStatus): string {
@@ -42,7 +44,7 @@ function testMatches(query: string, test: HatsTestWithBuildResult): boolean {
   )
 }
 
-export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable = true, version }: HatsGridProps) {
+export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable = true, version, latestVersion }: HatsGridProps) {
   const [query, setQuery] = useState('')
   const normalizedQuery = normalizeSearch(query)
 
@@ -91,6 +93,11 @@ export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable
                 className="underline decoration-dotted underline-offset-2 hover:text-foreground"
               >
                 deka v{version}
+                {latestVersion && latestVersion !== version && (
+                  <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+                    measured at {version} · latest is {latestVersion}
+                  </span>
+                )}
               </a>
               {!nativeAvailable && (
                 <span className="ml-2 text-amber-500">native runtime unavailable</span>
@@ -178,7 +185,7 @@ export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable
                           key={test.slug}
                           href={`/case/${test.slug}`}
                           title={`${test.title}\n${test.category} · wasm: ${test.wasmMatches ? 'match' : 'mismatch'} · native: ${test.nativeMatches ? 'match' : 'mismatch'}${cached ? '\nCACHED RESULTS — not live in the browser' : ''}`}
-                          className={`inline-flex size-4 rounded-sm transition-opacity hover:opacity-70 ${statusColor(test.overallStatus)}${cached ? ' ring-1 ring-amber-500/70 ring-offset-1 ring-offset-background' : ''}`}
+                          className={`inline-flex size-4 rounded-sm transition-opacity hover:opacity-70 ${statusColor(verdictOf(test))}${cached ? ' ring-1 ring-amber-500/70 ring-offset-1 ring-offset-background' : ''}`}
                         />
                       )
                     })}

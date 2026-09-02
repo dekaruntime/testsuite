@@ -24,3 +24,15 @@ export function computeOverallStatus(args: {
   if (nativeRan && browserRan && args.nativeMatches !== args.browserMatches) return 'divergent'
   return 'fail'
 }
+
+
+/**
+ * The verdict for a test, tolerating packs built either side of deka#533.
+ *
+ * `status` on a test is its EXPECTATION -- a `.fail.ds` fixture expects
+ * compilation to fail and carries `status: fail` while working correctly.
+ * 381 of 796 tests do. Never render `status` as an outcome.
+ */
+export function verdictOf(test: { verdict?: HatsOverallStatus; overallStatus: HatsOverallStatus }): HatsOverallStatus {
+  return test.verdict ?? test.overallStatus
+}

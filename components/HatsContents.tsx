@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { statusColor } from '@/components/HatsGrid'
 import type { HatsCategoryWithResults } from '@/lib/build-tests'
 import { isRecordedOnly } from '@/lib/recorded-only'
+import { verdictOf } from '@/lib/overall-status'
 import { GROUP_ORDER, groupOf } from '@/lib/test-group'
 
 interface HatsContentsProps {
@@ -105,7 +106,7 @@ export function HatsContents({ categories, currentSlug, onSelect, onClose }: Hat
                         }`}
                       >
                         <span
-                          className={`size-2.5 shrink-0 rounded-sm ${statusColor(test.overallStatus)}`}
+                          className={`size-2.5 shrink-0 rounded-sm ${statusColor(verdictOf(test))}`}
                           aria-hidden="true"
                         />
                         <span className="truncate">{test.title}</span>
