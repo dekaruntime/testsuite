@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import type { HatsCategoryWithResults, HatsTestWithBuildResult } from '@/lib/build-tests'
+import type { HatsCategoryWithResults, HatsGroups, HatsTestWithBuildResult } from '@/lib/build-tests'
 import type { HatsOverallStatus } from '@/lib/overall-status'
 import type { HatsHost } from '@/lib/tests'
 import { isRecordedOnly } from '@/lib/recorded-only'
 
 interface HatsGridProps {
   categories: HatsCategoryWithResults[]
+  groups?: HatsGroups
   nativeAvailable: boolean
   browserAvailable?: boolean
   version: string
@@ -40,7 +41,7 @@ function testMatches(query: string, test: HatsTestWithBuildResult): boolean {
   )
 }
 
-export function HatsGrid({ categories, nativeAvailable, browserAvailable = true, version }: HatsGridProps) {
+export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable = true, version }: HatsGridProps) {
   const [query, setQuery] = useState('')
   const normalizedQuery = normalizeSearch(query)
 
@@ -57,38 +58,14 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
   const allTests = useMemo(() => categories.flatMap((c) => c.tests), [categories])
   const total = allTests.length
 
-  // Report each host on its own terms. The previous single line collapsed
-  // native and wasm into one pass/fail/drift triple, which made a formatter
-  // difference on a test both hosts got right look identical to a genuine
-  // compiler divergence -- and hid the native result entirely.
-  const stats = useMemo(() => {
-    const declares = (t: (typeof allTests)[number], host: HatsHost) =>
-      (t.hosts ?? []).includes(host)
-
-    const nativeRun = allTests.filter((t) => declares(t, 'native'))
-    const nativePassing = nativeRun.filter((t) => t.nativeMatches).length
-
-    const wasmRun = allTests.filter((t) => declares(t, 'browser'))
-    const wasmPassing = wasmRun.filter((t) => t.wasmMatches).length
-
-    // Drift is only meaningful where a test declares BOTH hosts: it is the
-    // count of tests the two runtimes disagree about.
-    const dual = allTests.filter((t) => declares(t, 'native') && declares(t, 'browser'))
-    const drift = dual.filter((t) => t.nativeMatches !== t.wasmMatches).length
-
-    return {
-      native: {
-        passing: nativePassing,
-        failing: nativeRun.length - nativePassing,
-        skipped: total - nativeRun.length,
-      },
-      wasm: {
-        passing: wasmPassing,
-        failing: wasmRun.length - wasmPassing,
-        drift,
-      },
-    }
-  }, [allTests, total])
+  // Three groups, decided by each fixture's `hosts`. Divergence exists only in
+  // `shared`: it is meaningless for a fixture that runs on one host, and
+  // computing it corpus-wide made harness gaps look like compiler defects
+  // (deka#509). There is no skip bucket -- a native-only fixture is not
+  // "skipped on wasm", it was never a wasm test.
+  //
+  // These numbers are READ from the pack, never recomputed here. One producer
+  // owns every figure (deka#503, TESTING.md).
 
   const visibleCount = filteredCategories.flatMap((c) => c.tests).length
 
@@ -121,16 +98,29 @@ export function HatsGrid({ categories, nativeAvailable, browserAvailable = true,
                 <span className="ml-2 text-amber-500">browser runtime unavailable</span>
               )}
             </p>
-            <p className="tabular-nums">
-              <span className="font-medium text-foreground">native:</span>{' '}
-              {stats.native.passing} passing · {stats.native.failing} failing ·{' '}
-              {stats.native.skipped} skipped · {total} tests
-            </p>
-            <p className="tabular-nums">
-              <span className="font-medium text-foreground">wasm:</span>{' '}
-              {stats.wasm.passing} passing · {stats.wasm.failing} failing ·{' '}
-              {stats.wasm.drift} drift · {total} tests
-            </p>
+            {groups ? (
+              <>
+                <p className="tabular-nums">
+                  <span className="font-medium text-foreground">native-only:</span>{' '}
+                  {groups['native-only'].pass} pass · {groups['native-only'].fail} fail ·{' '}
+                  {groups['native-only'].total} tests
+                </p>
+                <p className="tabular-nums">
+                  <span className="font-medium text-foreground">shared:</span>{' '}
+                  {groups.shared.pass} pass · {groups.shared.fail} fail ·{' '}
+                  {groups.shared.diverge} diverge · {groups.shared.total} tests
+                </p>
+                <p className="tabular-nums">
+                  <span className="font-medium text-foreground">browser-only:</span>{' '}
+                  {groups['browser-only'].pass} pass · {groups['browser-only'].fail} fail ·{' '}
+                  {groups['browser-only'].total} tests
+                </p>
+              </>
+            ) : (
+              <p className="text-amber-500">
+                this pack carries no summary — rebuild it with a current dump
+              </p>
+            )}
           </div>
           <input
             type="search"

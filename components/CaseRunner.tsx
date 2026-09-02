@@ -472,22 +472,6 @@ export function CaseRunner({
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-      {recordedOnly ? (
-        <div
-          role="status"
-          className="border-b border-amber-500/40 bg-amber-500/15 px-6 py-2 text-center"
-        >
-          <p className="text-xs font-bold tracking-[0.18em] text-amber-900 dark:text-amber-200">
-            CACHED RESULTS
-          </p>
-          <p className="text-[11px] text-amber-900/80 dark:text-amber-200/80">
-            Not live — recorded from dump. The editor is read-only; this page is not frozen or broken.
-            {test.category === 'ADHOC'
-              ? ' ADHOC squares show the commands that ran and their stdout.'
-              : ''}
-          </p>
-        </div>
-      ) : null}
       <header className="border-b border-border px-6 py-3">
         <div className="flex items-center gap-4">
           <a

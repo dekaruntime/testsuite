@@ -12,6 +12,13 @@ import { setCompilerArtifactPath } from '@dekaruntime/web-ide-kit/runtime'
 import { loadAllTests, type HatsCategory, type HatsHost, type HatsTest, type HatsTestStage } from './tests'
 import { computeOverallStatus, type HatsOverallStatus } from './overall-status'
 
+/** Summary the pack carries; the site renders it and never recomputes it. */
+export interface HatsGroups {
+  'native-only': { pass: number; fail: number; total: number }
+  shared: { pass: number; fail: number; diverge: number; total: number }
+  'browser-only': { pass: number; fail: number; total: number }
+}
+
 export { computeOverallStatus, type HatsOverallStatus } from './overall-status'
 
 export type RuntimeStatus = 'pass' | 'fail'
@@ -190,6 +197,7 @@ export interface HatsBuildResults {
   browserAvailable: boolean
   version: string
   wasmSourceCommit?: string
+  groups?: HatsGroups
   categories: HatsCategoryWithResults[]
 }
 
@@ -322,6 +330,9 @@ export async function loadBuildResults(): Promise<HatsBuildResults> {
     browserAvailable: raw.browserAvailable !== false,
     version: raw.version ?? 'unknown',
     wasmSourceCommit: raw.wasmSourceCommit,
+    // The pack owns the summary. The site renders it and never recomputes it --
+    // one producer owns every number (deka#503, TESTING.md).
+    groups: raw.groups,
     categories: raw.categories,
   }
 }
