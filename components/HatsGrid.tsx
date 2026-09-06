@@ -94,7 +94,7 @@ export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable
                 rel="noreferrer"
                 className="underline decoration-dotted underline-offset-2 hover:text-foreground"
               >
-                deka v{version}
+                dsc v{version}
                 {wasmSourceCommit && (
                   <span className="ml-1 font-mono text-muted-foreground">
                     @{wasmSourceCommit.slice(0, 7)}

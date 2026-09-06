@@ -247,7 +247,7 @@ export function CaseRunner({
             diagnostics: compileResult.diagnostics,
             compiler: compileResult.compiler
               ? {
-                  name: compileResult.compiler.name ?? 'deka',
+                  name: compileResult.compiler.name ?? 'dsc',
                   version: compileResult.compiler.version ?? '0.0.0',
                   sourceCommit: compileResult.compiler.sourceCommit ?? '',
                 }
@@ -270,7 +270,7 @@ export function CaseRunner({
           diagnostics: compileResult.diagnostics,
           compiler: compileResult.compiler
             ? {
-                name: compileResult.compiler.name ?? 'deka',
+                name: compileResult.compiler.name ?? 'dsc',
                 version: compileResult.compiler.version ?? '0.0.0',
                 sourceCommit: compileResult.compiler.sourceCommit ?? '',
               }
