@@ -16,7 +16,7 @@ function slugMatches(slug) {
 }
 
 const compiler = await loadWasmCompiler()
-const wasmManifest = await (await fetch('https://wasm.deka.gg/latest/deka-compiler-artifact.json')).json()
+const wasmManifest = await (await fetch('https://dsc-wasm.deka.gg/latest/deka-compiler-artifact.json')).json()
 const nativeCliPath = await prepareNativeCli(wasmManifest.compiler.version)
 const skipped = []
 

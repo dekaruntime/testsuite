@@ -1,7 +1,7 @@
 // The diagnostics worker loads the latest reviewed artifact from the public R2
-// bucket at wasm.deka.gg. It validates ABI compatibility but does not pin a
+// bucket at dsc-wasm.deka.gg. It validates ABI compatibility but does not pin a
 // specific source revision, so the tour stays current with runtime releases.
-const MANIFEST_URL = 'https://wasm.deka.gg/latest/deka-diagnostics-artifact.json'
+const MANIFEST_URL = 'https://dsc-wasm.deka.gg/latest/deka-diagnostics-artifact.json'
 const REQUIRED_ABI = 1
 let adapterPromise
 
