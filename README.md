@@ -13,6 +13,7 @@ Fixtures live in [`dekaruntime/deka`](https://github.com/dekaruntime/deka) at
 - The grid is dump-time. Pink means the two hosts disagreed when deka dumped.
 
 CI does **not** re-run 620 tests and does not launch Chromium. It fills in the
+compiler WASM from `https://dsc-wasm.deka.gg/latest/` and the
 conformance pack from `https://wasm.deka.gg/latest/conformance/` (or the last
 published dump), then `next build` + deploy.
 

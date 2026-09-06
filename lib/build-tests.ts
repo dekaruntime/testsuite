@@ -209,7 +209,7 @@ export interface HatsBuildResults {
   categories: HatsCategoryWithResults[]
 }
 
-const WASM_COMPILER_MANIFEST_URL = 'https://wasm.deka.gg/latest/deka-compiler-artifact.json'
+const WASM_COMPILER_MANIFEST_URL = 'https://dsc-wasm.deka.gg/latest/deka-compiler-artifact.json'
 
 async function runAllTestsOnce(): Promise<HatsBuildResults> {
   setCompilerArtifactPath(WASM_COMPILER_MANIFEST_URL)
@@ -334,7 +334,7 @@ export async function loadAndRunAllTests(): Promise<HatsBuildResults> {
  */
 async function latestReleasedVersion(): Promise<string | null> {
   try {
-    const res = await fetch('https://releases.deka.gg/latest.json', {
+    const res = await fetch('https://dsc-wasm.deka.gg/latest/release.json', {
       signal: AbortSignal.timeout(5000),
     })
     if (!res.ok) return null
@@ -354,7 +354,7 @@ async function latestReleasedVersion(): Promise<string | null> {
  * version check stays silent and the page implies the numbers describe
  * current main when they describe a release (testsuite#65).
  *
- * `dekaruntime/deka` is private, so this needs a token and is skipped without
+ * `dekaruntime/dsc` is private, so this needs a token and is skipped without
  * one. Same contract as `latestReleasedVersion`: build-time only, never
  * throws, and the page degrades to showing provenance without a distance.
  */
@@ -363,7 +363,7 @@ async function commitsBehindMain(measuredCommit?: string): Promise<number | null
   if (!token || !measuredCommit) return null
   try {
     const res = await fetch(
-      `https://api.github.com/repos/dekaruntime/deka/compare/${measuredCommit}...main`,
+      `https://api.github.com/repos/dekaruntime/dsc/compare/${measuredCommit}...main`,
       {
         headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' },
         signal: AbortSignal.timeout(8000),
