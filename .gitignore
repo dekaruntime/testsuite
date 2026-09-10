@@ -49,5 +49,6 @@ next-env.d.ts
 /.cache/
 /native-run-*/
 
-# Fixtures live in dekaruntime/deka tests/testsuite. Ingest reconstructs this.
-/tests/
+# The authoritative fixtures are tracked in /corpus. The runner may create
+# scratch directories when maintainers exercise a fixture locally.
+/corpus/.run-tmp/

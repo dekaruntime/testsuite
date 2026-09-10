@@ -1,9 +1,11 @@
 # deka test suite
 
-The **website** for public DekaScript conformance: **https://testsuite.deka.gg**
+The **website** and authoritative corpus for public DekaScript conformance:
+**https://testsuite.deka.gg**
 
 Fixtures live in [`dekaruntime/deka`](https://github.com/dekaruntime/deka) at
-`tests/testsuite/`. This repo displays them. See [deka#292](https://github.com/dekaruntime/deka/issues/292).
+`corpus/`. The deka runtime and dsc compiler download this tree in CI from a
+versioned, checksummed pin; neither repository vendors the fixtures.
 
 ## How it works
 
@@ -22,7 +24,7 @@ published dump), then `next build` + deploy.
 Add a Hats folder in **deka**:
 
 ```
-tests/testsuite/<category>/<name>/
+corpus/<category>/<name>/
   <name>.pass.ds | <name>.fail.ds
   <name>.stdout / <name>.code / <name>.json
 ```

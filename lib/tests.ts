@@ -33,7 +33,10 @@ export interface HatsCategory {
   tests: HatsTest[]
 }
 
-const TESTS_DIR = path.join(process.cwd(), 'tests')
+// The conformance corpus is owned and versioned in this repository. Build
+// results are still fetched from the runtime release, but fixture source and
+// expectations must never be reconstructed from a compiler checkout.
+const TESTS_DIR = path.join(process.cwd(), 'corpus')
 
 function parseStatusFromFilename(filename: string): HatsTestStatus | null {
   if (filename.endsWith('.pass.ds')) return 'pass'
