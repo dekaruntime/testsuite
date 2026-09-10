@@ -15,7 +15,6 @@ interface HatsGridProps {
   nativeAvailable: boolean
   browserAvailable?: boolean
   version: string
-  latestVersion?: string | null
   commitsBehindMain?: number | null
   wasmSourceCommit?: string
 }
@@ -46,7 +45,7 @@ function testMatches(query: string, test: HatsTestWithBuildResult): boolean {
   )
 }
 
-export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable = true, version, latestVersion, commitsBehindMain, wasmSourceCommit }: HatsGridProps) {
+export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable = true, version, commitsBehindMain, wasmSourceCommit }: HatsGridProps) {
   const [query, setQuery] = useState('')
   const normalizedQuery = normalizeSearch(query)
 
@@ -95,14 +94,9 @@ export function HatsGrid({ categories, groups, nativeAvailable, browserAvailable
                 className="underline decoration-dotted underline-offset-2 hover:text-foreground"
               >
                 dsc v{version}
-                {wasmSourceCommit && (
+                {wasmSourceCommit && wasmSourceCommit !== 'unknown' && (
                   <span className="ml-1 font-mono text-muted-foreground">
                     @{wasmSourceCommit.slice(0, 7)}
-                  </span>
-                )}
-                {latestVersion && latestVersion !== version && (
-                  <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
-                    measured at {version} · latest is {latestVersion}
                   </span>
                 )}
                 {typeof commitsBehindMain === 'number' && commitsBehindMain > 0 && (
