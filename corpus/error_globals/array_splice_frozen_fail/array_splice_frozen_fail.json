@@ -1,0 +1,6 @@
+{
+  "title": "Splicing a const array fails",
+  "stage": "parse",
+  "notes": "The checker rejects mutation before emission.",
+  "expectedDiagnosticContains": "cannot call mutable method `splice` on an immutable receiver"
+}
