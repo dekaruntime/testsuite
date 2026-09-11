@@ -1,6 +1,6 @@
 {
-  "title": "Calling a Math constant as a function fails",
-  "stage": "run",
-  "expectedDiagnosticContains": "is not a function",
-  "notes": "Math.PI is a number, not a function."
+  "title": "Math global is not available in DekaScript",
+  "stage": "parse",
+  "expectedDiagnosticContains": "`Math` is not available in DekaScript; import { PI } from \"math\" instead for PI, or use number methods such as `x.sqrt()`",
+  "notes": "The Math global is rejected before its PI constant can be called."
 }

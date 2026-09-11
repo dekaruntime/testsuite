@@ -1,0 +1,5 @@
+{
+  "title": "PI is available from the math module",
+  "stage": "run",
+  "notes": "The closed compiler-provided math module replaces the ambient Math global for PI."
+}

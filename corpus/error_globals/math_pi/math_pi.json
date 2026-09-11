@@ -1,5 +1,6 @@
 {
-  "title": "Math.PI constant",
-  "stage": "run",
-  "notes": ""
+  "title": "Math global is not available in DekaScript",
+  "stage": "parse",
+  "expectedDiagnosticContains": "`Math` is not available in DekaScript; import { PI } from \"math\" instead for PI, or use number methods such as `x.sqrt()`",
+  "notes": "Import PI from the closed math module instead of reading the ambient JavaScript Math global."
 }

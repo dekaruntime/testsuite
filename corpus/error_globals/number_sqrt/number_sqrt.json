@@ -1,0 +1,5 @@
+{
+  "title": "sqrt is a number method",
+  "stage": "run",
+  "notes": "Number methods replace the ambient JavaScript Math global."
+}
