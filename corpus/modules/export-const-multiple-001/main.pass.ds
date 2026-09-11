@@ -1,4 +1,4 @@
 import { echo } from "io"
 import { PI, E } from "./constants.ds"
-echo(PI)
-echo(E)
+echo(string(PI))
+echo(string(E))
