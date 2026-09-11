@@ -11,15 +11,16 @@ jobs:
   request-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Require testsuite-site dispatch token
-        if: ${{ secrets.CASCADE_DISPATCH_TOKEN == '' }}
-        run: |
-          echo "::error::CASCADE_DISPATCH_TOKEN is required to request a testsuite-site deployment."
-          exit 1
-
       - name: Request testsuite-site deployment
+        env:
+          # secrets are not usable in step-level `if:` — the whole workflow
+          # fails at startup. Guard in shell instead (fails red, visibly).
+          GH_TOKEN: ${{ secrets.CASCADE_DISPATCH_TOKEN }}
         run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::CASCADE_DISPATCH_TOKEN is required to request a testsuite-site deployment."
+            exit 1
+          fi
           gh api --method POST repos/dekaruntime/testsuite-site/dispatches \
-            -H "Authorization: Bearer ${{ secrets.CASCADE_DISPATCH_TOKEN }}" \
             -f event_type=corpus-updated \
             -f "client_payload[corpus_sha]=${{ github.sha }}"
