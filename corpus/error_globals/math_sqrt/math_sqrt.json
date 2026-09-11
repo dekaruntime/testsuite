@@ -1,5 +1,6 @@
 {
-  "title": "Math.sqrt global",
-  "stage": "run",
-  "notes": ""
+  "title": "Math.sqrt global is not available in DekaScript",
+  "stage": "parse",
+  "expectedDiagnosticContains": "`Math` is not available in DekaScript; import { PI } from \"math\" instead for PI, or use number methods such as `x.sqrt()`",
+  "notes": "Use the number method x.sqrt() instead of the ambient JavaScript Math global."
 }
