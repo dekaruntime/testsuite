@@ -1,0 +1,25 @@
+name: Request testsuite-site deployment
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  request-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require testsuite-site dispatch token
+        if: ${{ secrets.TESTSUITE_SITE_DISPATCH_TOKEN == '' }}
+        run: |
+          echo "::error::TESTSUITE_SITE_DISPATCH_TOKEN is required to request a testsuite-site deployment."
+          exit 1
+
+      - name: Request testsuite-site deployment
+        run: |
+          gh api --method POST repos/dekaruntime/testsuite-site/dispatches \
+            -H "Authorization: Bearer ${{ secrets.TESTSUITE_SITE_DISPATCH_TOKEN }}" \
+            -f event_type=corpus-updated \
+            -f "client_payload[corpus_sha]=${{ github.sha }}"
