@@ -1,3 +1,6 @@
 import { echo } from "io"
 const x: number = 16
-echo(x.sqrt())
+let root = unwrap(x.sqrt()) or {
+  0
+}
+echo(string(root))
