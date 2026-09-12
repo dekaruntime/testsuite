@@ -1,0 +1,8 @@
+import { echo } from "io"
+struct Trouble { message: string }
+alias Fault = Trouble
+fn local() string {
+  try { return Throw(Trouble { message: "typed" }); }
+  catch (e: Fault) { return e.message; }
+}
+echo(local());

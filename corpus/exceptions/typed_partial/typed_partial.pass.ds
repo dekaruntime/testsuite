@@ -1,0 +1,13 @@
+import { echo } from "io"
+struct TextError { message: string }
+struct NumberError { code: number }
+fn source(fail: boolean) Exception<number, TextError | NumberError> {
+  if (fail) { return Throw(TextError { message: "typed" }); }
+  return Throw(NumberError { code: 3 });
+}
+fn partial(fail: boolean) Exception<string, NumberError> {
+  try { const n = source(fail); return Ok(string(n)); }
+  catch (e: TextError) { return Ok(e.message); }
+}
+echo(match partial(true) { Ok(v) => v, Throw(e) => string(e.code) });
+echo(match partial(false) { Ok(v) => v, Throw(e) => string(e.code) });

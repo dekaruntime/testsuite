@@ -1,0 +1,5 @@
+{
+  "title": "bodyless payload patterns",
+  "stage": "run",
+  "notes": "rfd#62: passthrough payload patterns and complete call-site consumption."
+}

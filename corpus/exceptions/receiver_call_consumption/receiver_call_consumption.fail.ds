@@ -1,0 +1,4 @@
+struct Thing {}
+fn (t Thing) to_result() Exception<number, string> { return Ok(1); }
+const t = Thing {};
+const later = t.to_result();

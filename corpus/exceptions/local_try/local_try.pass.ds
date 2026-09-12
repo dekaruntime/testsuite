@@ -1,0 +1,5 @@
+import { echo } from "io"
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn local(fail: boolean) number { try { const n = source(fail); return n + 1; } catch (e) { return e.length; } }
+echo(string(local(false)));
+echo(string(local(true)));

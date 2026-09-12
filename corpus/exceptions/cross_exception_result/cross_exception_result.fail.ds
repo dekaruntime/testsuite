@@ -1,0 +1,2 @@
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn f() Result<number, string> { return match source(false) { Ok(v) => Ok(v), Throw(e) }; }

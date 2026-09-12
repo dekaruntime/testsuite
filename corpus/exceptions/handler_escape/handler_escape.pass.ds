@@ -1,0 +1,4 @@
+import { echo } from "io"
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn raising() Exception<number, string> { return match source(false) { Ok(v) => Throw("handler"), Throw(e) => Ok(0) }; }
+echo(match raising() { Ok(v) => string(v), Throw(e) => e });

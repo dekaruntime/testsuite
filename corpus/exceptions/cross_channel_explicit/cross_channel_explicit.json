@@ -1,0 +1,5 @@
+{
+  "title": "cross channel explicit",
+  "stage": "run",
+  "notes": "rfd#62 stage 1; paired with dsc rfd62/exception-core."
+}

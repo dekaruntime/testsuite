@@ -1,0 +1,5 @@
+import { echo } from "io"
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn raised(fail: boolean) Exception<number, string> { const n = match source(fail) { Ok(v) => v, Throw(e) }; return Ok(n + 1); }
+echo(string(match raised(false) { Ok(v) => v, Throw(e) => 0 }));
+echo(match raised(true) { Ok(v) => string(v), Throw(e) => e });

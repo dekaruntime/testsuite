@@ -1,0 +1,1 @@
+enum User { Value(number) } fn f() User { return match User.Value(1) { User.Value(v) }; }

@@ -1,0 +1,5 @@
+{
+  "title": "typed struct alias",
+  "stage": "run",
+  "notes": "rfd#62 typed coverage and native instanceof with constructor identity."
+}

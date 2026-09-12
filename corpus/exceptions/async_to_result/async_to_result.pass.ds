@@ -1,0 +1,4 @@
+import { echo } from "io"
+async fn source() Promise<Exception<number, string>> { return Throw("rejection"); }
+const r = (await source()).to_result();
+echo(match r { Ok(v) => string(v), Err(e) => e });

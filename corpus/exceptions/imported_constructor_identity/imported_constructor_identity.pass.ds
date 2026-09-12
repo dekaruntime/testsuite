@@ -1,0 +1,8 @@
+import { echo } from "io"
+import { Fault as Left } from "./left.ds"
+import { Fault as Right, source } from "./right.ds"
+fn discriminate() Exception<string, Right> {
+  try { const n = source(); return Ok(string(n)); }
+  catch (e: Left) { return Ok("wrong"); }
+}
+echo(match discriminate() { Ok(v) => v, Throw(e) => e.message });

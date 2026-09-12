@@ -1,0 +1,2 @@
+struct Fault { message: string }
+export { Fault }

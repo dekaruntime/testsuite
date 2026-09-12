@@ -1,6 +1,6 @@
 import { echo } from "io"
 try {
-  echo(1)
+  echo("try")
 } catch (e) {
-  echo(e)
+  echo("catch")
 }

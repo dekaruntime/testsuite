@@ -1,0 +1,1 @@
+fn f() Exception<number, string> { return Throw(1); }

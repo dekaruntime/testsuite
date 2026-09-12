@@ -1,0 +1,1 @@
+fn f() number { try { const cb = fn() number { return Throw("bad"); }; return cb(); } catch (e) { return 0; } }

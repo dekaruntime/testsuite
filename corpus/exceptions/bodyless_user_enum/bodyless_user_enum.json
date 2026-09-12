@@ -1,0 +1,6 @@
+{
+  "title": "bodyless user enum",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "privilege of Result and Exception only",
+  "notes": "rfd#62 stage 1; assert the rule-specific teaching diagnostic."
+}

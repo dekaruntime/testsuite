@@ -1,0 +1,6 @@
+import { echo } from "io"
+try {
+  echo("try")
+} catch (e) {
+  echo("catch")
+}

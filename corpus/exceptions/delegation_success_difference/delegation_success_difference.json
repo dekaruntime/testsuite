@@ -1,0 +1,6 @@
+{
+  "title": "delegation success difference",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "EXACT return type match",
+  "notes": "rfd#62 stage 1; assert the rule-specific teaching diagnostic."
+}
