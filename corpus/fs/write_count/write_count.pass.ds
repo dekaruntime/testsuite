@@ -9,9 +9,9 @@ fn utf8(value: string) bytes {
 }
 async fn go() {
   const w = await write_file(".cache/n.txt", utf8("abcd"))
-  echo(match (w) {
+  echo(string(match (w) {
     Ok(n) => n,
     Err(e) => 0,
-  })
+  }))
 }
 go()
