@@ -1,0 +1,2 @@
+summon { total noop(): void } from "./foreign.mjs"
+noop()

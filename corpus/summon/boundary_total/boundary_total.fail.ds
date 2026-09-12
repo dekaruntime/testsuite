@@ -1,0 +1,2 @@
+summon { total absent(): number } from "./foreign.mjs"
+const n = absent()

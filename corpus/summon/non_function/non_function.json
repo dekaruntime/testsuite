@@ -1,0 +1,6 @@
+{
+  "title": "non function",
+  "stage": "typecheck",
+  "notes": "rfd#39 core paired with dsc rfd39/summon-core; Option stays tagged pending dsc#98. Tier-2 analysis and summon CLI are deferred.",
+  "expectedDiagnosticContains": "not a statically verifiable function"
+}

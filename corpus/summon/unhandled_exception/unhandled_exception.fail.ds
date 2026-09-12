@@ -1,0 +1,2 @@
+summon { fail(): Exception<number, string> } from "./foreign.mjs"
+const x = fail()
