@@ -1,0 +1,3 @@
+summon { total later(): Promise<number> } from "./foreign.mjs"
+const n = await later()
+if (n != 9) { panic("async boundary"); }

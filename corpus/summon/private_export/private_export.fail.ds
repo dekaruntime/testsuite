@@ -1,0 +1,3 @@
+opaque type Handle
+summon { total handle(): Handle, total read(h: Handle): number } from "./foreign.mjs"
+export { handle }

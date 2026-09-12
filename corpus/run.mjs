@@ -112,8 +112,9 @@ function collectDsFiles(dir, relativeTo) {
       entry.isFile() &&
       (entry.name.endsWith(".ds") ||
         entry.name.endsWith(".dsx") ||
-        entry.name.endsWith(".css"))
+        entry.name.endsWith(".css") || entry.name.endsWith(".mjs"))
     ) {
+      // .mjs files are vendored summon fixtures, copied without fetching.
       // .css files are component-authored stylesheets: copied next to the
       // fixture sources so side-effect `import "./x.css"` resolves (RFD 24
       // §10.6 attribute scoping).
