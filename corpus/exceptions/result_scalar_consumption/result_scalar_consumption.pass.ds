@@ -1,0 +1,8 @@
+import { echo } from "io"
+fn scalar(fail: boolean) number { return match (fail ? Err("bad") : Ok(7)) { Ok(7) => 9, Ok(v) => v, Err(e) => 0 }; }
+fn local(fail: boolean) number { const result = fail ? Err("bad") : Ok(7); return match result { Ok(v) => v, Err(e) => 0 }; }
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn convert(fail: boolean) number { return match source(fail).to_result() { Ok(v) => v, Err(e) => 0 }; }
+echo(string(scalar(false))); echo(string(scalar(true)));
+echo(string(local(false))); echo(string(local(true)));
+echo(string(convert(false))); echo(string(convert(true)));

@@ -1,0 +1,2 @@
+fn data() Result<number, string> { return Err("bad"); }
+fn wrong() Exception<number, string> { return Ok(1 + (match data() { Ok(v) => v, Err(e) })); }

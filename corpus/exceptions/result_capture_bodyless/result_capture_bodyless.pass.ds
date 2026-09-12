@@ -1,0 +1,6 @@
+import { echo } from "io"
+fn data(fail: boolean) Result<number, string> { return fail ? Err("bad") : Ok(7); }
+fn add(a: number, b: number) Result<number, string> { return Ok(a + b); }
+fn captured(fail: boolean) Result<number, string> { let seen = 0; const f = add(_, match data(fail) { Ok(v) => v, Err(e) }); seen = 1; const r = f(2); return match r { Ok(v) => Ok(v + seen), Err(e) => Err(string(seen) + e) }; }
+echo(match captured(false) { Ok(v) => string(v), Err(e) => e });
+echo(match captured(true) { Ok(v) => string(v), Err(e) => e });

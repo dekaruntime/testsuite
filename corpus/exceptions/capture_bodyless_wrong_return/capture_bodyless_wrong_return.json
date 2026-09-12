@@ -1,0 +1,6 @@
+{
+  "title": "Bodyless propagation must fit the capture return type",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "the enclosing return type must carry the bodyless variant",
+  "notes": "rfd#62 stage 2a: an outer Result return does not authorize propagation from a number-returning capture."
+}

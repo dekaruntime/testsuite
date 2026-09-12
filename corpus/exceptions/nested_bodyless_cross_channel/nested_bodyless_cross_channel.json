@@ -1,0 +1,6 @@
+{
+  "title": "nested bodyless cross channel rejection",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "raise it into the exception channel explicitly",
+  "notes": "Nested expression lifting must retain the checker rule for explicit channel conversion."
+}

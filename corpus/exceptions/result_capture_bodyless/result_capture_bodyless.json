@@ -1,0 +1,5 @@
+{
+  "title": "Result bodyless propagation inside a function capture",
+  "stage": "run",
+  "notes": "rfd#62 stage 2a: fixed operands remain delayed and bodyless arms return from the capture."
+}

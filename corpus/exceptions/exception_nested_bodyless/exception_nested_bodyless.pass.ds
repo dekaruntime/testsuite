@@ -1,0 +1,5 @@
+import { echo } from "io"
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn nested(fail: boolean) Exception<number, string> { return Ok(1 + (match source(fail) { Ok(v) => v, Throw(e) })); }
+echo(match nested(false) { Ok(v) => string(v), Throw(e) => e });
+echo(match nested(true) { Ok(v) => string(v), Throw(e) => e });
