@@ -1,0 +1,2 @@
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn f() Exception<number | string, string> { return source(false); }

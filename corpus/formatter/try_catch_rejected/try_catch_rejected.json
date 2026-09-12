@@ -1,6 +1,5 @@
 {
-  "title": "Try Catch Rejected",
-  "stage": "parse",
-  "notes": "Formatter passthrough for invalid try catch rejected source.",
-  "expectedDiagnosticContains": "expected `;` or newline, found ``{``"
+  "title": "Try catch is legal (rfd#62)",
+  "stage": "run",
+  "notes": "Former rejection fixture; checked exceptions make frame-local handling legal."
 }

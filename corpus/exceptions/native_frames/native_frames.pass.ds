@@ -1,0 +1,5 @@
+import { echo } from "io"
+fn source(fail: boolean) Exception<number, string> { if (fail) { return Throw("bad"); } return Ok(7); }
+fn delegated(fail: boolean) Exception<number, string> { return source(fail); }
+echo(string(match delegated(false) { Ok(v) => v, Throw(e) => 0 }));
+echo(match delegated(true) { Ok(v) => string(v), Throw(e) => e });

@@ -1,0 +1,1 @@
+fn f(e: SyntaxError | TypeError) number { try { return Throw(e); } catch (e: SyntaxError) { return 0; } }

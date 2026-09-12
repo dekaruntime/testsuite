@@ -1,0 +1,7 @@
+import { echo } from "io"
+import { Fault as ImportedFault, source } from "./thrower.ds"
+fn local() string {
+  try { const n = source(); return string(n); }
+  catch (e: ImportedFault) { return e.message; }
+}
+echo(local());

@@ -1,0 +1,5 @@
+import { echo } from "io"
+fn data() Result<number, string> { return Err("explicit"); }
+fn raised() Exception<number, string> { return match data() { Ok(v) => Ok(v), Err(e) => Throw(e) }; }
+const r: Result<number, string> = match raised() { Ok(v) => Ok(v), Throw(e) => Err(e) };
+echo(match r { Ok(v) => string(v), Err(e) => e });

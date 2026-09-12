@@ -1,0 +1,1 @@
+async fn f() Promise<Exception<number, string>> { return Throw("bad"); } const later = await f();

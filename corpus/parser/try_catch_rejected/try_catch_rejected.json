@@ -1,5 +1,5 @@
 {
-  "title": "try/catch statement is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "expected `;` or newline, found ``{``"
+  "title": "Try catch is legal (rfd#62)",
+  "stage": "run",
+  "notes": "Former rejection fixture; checked exceptions make frame-local handling legal."
 }

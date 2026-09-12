@@ -1,0 +1,4 @@
+import { echo } from "io"
+fn data() Result<number, string> { return Ok(7); }
+fn early() Result<number, string> { const x = match data() { Ok(v), Err(e) => 0 }; return Err("after"); }
+echo(match early() { Ok(v) => string(v), Err(e) => e });

@@ -1,0 +1,6 @@
+{
+  "title": "no stored throw",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "must be in escaping position",
+  "notes": "rfd#62 stage 1; assert the rule-specific teaching diagnostic."
+}

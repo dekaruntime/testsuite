@@ -1,0 +1,6 @@
+{
+  "title": "escaping throw",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "escaping `Throw` forces",
+  "notes": "rfd#62 stage 1; assert the rule-specific teaching diagnostic."
+}

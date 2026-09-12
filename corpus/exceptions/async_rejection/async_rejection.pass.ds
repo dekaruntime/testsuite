@@ -1,0 +1,4 @@
+import { echo } from "io"
+async fn source() Promise<Exception<number, string>> { return Throw("rejection"); }
+async fn local() Promise<string> { return match await source() { Ok(v) => string(v), Throw(e) => e }; }
+echo(await local());

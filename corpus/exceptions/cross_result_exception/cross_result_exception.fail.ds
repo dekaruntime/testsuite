@@ -1,0 +1,1 @@
+fn f() Exception<number, string> { return match Err("bad") { Ok(v) => Ok(1), Err(e) }; }
