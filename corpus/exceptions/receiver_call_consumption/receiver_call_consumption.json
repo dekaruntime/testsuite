@@ -1,0 +1,6 @@
+{
+  "title": "receiver call consumption",
+  "stage": "typecheck",
+  "notes": "rfd#62: passthrough payload patterns and complete call-site consumption.",
+  "expectedDiagnosticContains": "match it where you call it, or convert to Result"
+}

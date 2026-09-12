@@ -1,0 +1,6 @@
+import { echo } from "io"
+fn source() Exception<number, string> { return Throw("wild"); }
+fn relay() Exception<number, string> { return match source() { Ok(_), Throw("wild"), Throw(_) }; }
+fn data(r: Result<number, string>) Result<number, string> { return match r { Ok(_), Err(_) }; }
+echo(match relay() { Ok(v) => string(v), Throw(e) => e });
+echo(match data(Err("kept")) { Ok(v) => string(v), Err(e) => e });

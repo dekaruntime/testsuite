@@ -1,0 +1,2 @@
+fn source() Exception<number, string> { return Ok(1); }
+const later = match source() { Ok(v) => Exception.Ok(v), Throw(e) => Exception.Ok(0) };
