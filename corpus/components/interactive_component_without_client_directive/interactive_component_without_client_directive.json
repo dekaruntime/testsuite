@@ -1,5 +1,6 @@
 {
   "title": "Interactive components require a client directive at their tag",
   "stage": "typecheck",
-  "expectedDiagnosticContains": "uses interactive APIs and will not render"
+  "expectedDiagnosticContains": "uses interactive APIs and will not render",
+  "notes": "Uses an event handler to exercise the RFD-24 hydration diagnostic without a package import. The native language runner skips packages fixtures and cannot materialize a local package manifest and lock for ui/reactive (dsc#175)."
 }
