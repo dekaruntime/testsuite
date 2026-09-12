@@ -1,5 +1,5 @@
 {
-  "title": "Nested generic Option<Option<number>> parses and typechecks",
+  "title": "Nested generic Option<Array<number>> parses and typechecks",
   "stage": "run",
-  "notes": "The lexer emits >> as a single Shr token; the type parser splits it when closing nested generics (deka#465)."
+  "notes": "The lexer emits >> as a single Shr token; the type parser splits it when closing nested generics (deka#465). rfd#62: use a representable nested generic; Option<Option<T>> is now rejected in diagnostics/option_nested."
 }
