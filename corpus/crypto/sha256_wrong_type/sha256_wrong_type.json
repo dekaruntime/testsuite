@@ -8,5 +8,5 @@
     "crypto"
   ],
   "notes": "Native-only. Code lives in the package from the index (`deka add`), not in this fixture.",
-  "expectedDiagnosticContains": "expected bytes, got string"
+  "expectedDiagnosticContains": "expected argument type `bytes`, found type `string`"
 }
