@@ -1,0 +1,6 @@
+import { echo } from "io"
+fn data() Result<number, string> { return Err("early"); }
+fn lazy() Result<boolean, string> { return Ok(false && (match data() { Ok(v) => true, Err(e) })); }
+fn choice() Result<number, string> { return Ok(true ? 2 : (match data() { Ok(v) => v, Err(e) })); }
+echo(match lazy() { Ok(v) => string(v), Err(e) => e });
+echo(match choice() { Ok(v) => string(v), Err(e) => e });

@@ -1,0 +1,3 @@
+fn data() Result<number, string> { return Err("bad"); }
+fn add(a: number, b: number) number { return a + b; }
+fn outer() Result<number, string> { const f = add(_, match data() { Ok(v) => v, Err(e) }); return Ok(f(1)); }

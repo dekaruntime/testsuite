@@ -1,0 +1,8 @@
+import { echo } from "io"
+enum Status { Good(number), Bad(string) }
+fn store(fail: boolean) Result<number, string> { return fail ? Err("bad") : Ok(7); }
+fn converted(r: Result<number, string>) Exception<number, string> { return Exception.from(r); }
+const data = [store(false), store(true)];
+for (const r of data) { echo(match converted(r) { Ok(v) => string(v), Throw(e) => e }); }
+const status = Status.Good(3);
+echo(match status { Good(v) => string(v), Bad(e) => e });

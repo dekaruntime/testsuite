@@ -1,0 +1,5 @@
+{
+  "title": "result data roundtrip",
+  "stage": "run",
+  "notes": "rfd#62 stage 2a: Result-only erasure and nested bodyless lowering. Paired with dsc rfd62/erasure-train; Option representation remains unchanged."
+}

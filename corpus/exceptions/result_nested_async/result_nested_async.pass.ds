@@ -1,0 +1,5 @@
+import { echo } from "io"
+async fn data(fail: boolean) Promise<Result<number, string>> { return fail ? Err("bad") : Ok(7); }
+async fn nested(fail: boolean) Promise<Result<number, string>> { return Ok(1 + (match await data(fail) { Ok(v) => v, Err(e) })); }
+echo(match await nested(false) { Ok(v) => string(v), Err(e) => e });
+echo(match await nested(true) { Ok(v) => string(v), Err(e) => e });
