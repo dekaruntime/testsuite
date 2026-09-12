@@ -8,5 +8,5 @@
     "time"
   ],
   "notes": "Native-only. Code lives in the package from the index (`deka add`), not in this fixture.",
-  "expectedDiagnosticContains": "expected number, got string"
+  "expectedDiagnosticContains": "expected argument type `number`, found type `string`"
 }

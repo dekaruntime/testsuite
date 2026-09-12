@@ -5,27 +5,39 @@ import { echo } from "io"
 // deka#566.
 const nums: Array<number> = [3, 4, 5]
 
-let f = unwrap(nums.first()) or { -1 }
+let f = unwrap(nums.first()) or {
+  -1
+}
 echo(string(f))
 
-let l = unwrap(nums.last()) or { -1 }
+let l = unwrap(nums.last()) or {
+  -1
+}
 echo(string(l))
 
 // Empty array takes the absent branch.
 const empty: Array<string> = []
-let nf = unwrap(empty.first()) or { "none" }
+let nf = unwrap(empty.first()) or {
+  "none"
+}
 echo(nf)
 
 // first()/last() only read, so they work on frozen const arrays —
 // where calling pop() is a compile error instead (deka#566).
 const frozen: Array<number> = [7, 8, 9]
-let ff = unwrap(frozen.first()) or { -1 }
-let fl = unwrap(frozen.last()) or { -1 }
+let ff = unwrap(frozen.first()) or {
+  -1
+}
+let fl = unwrap(frozen.last()) or {
+  -1
+}
 echo(string(ff))
 echo(string(fl))
 
 // Literal receiver works too.
-let m = unwrap([10, 20, 30].last()) or { -1 }
+let m = unwrap([10, 20, 30].last()) or {
+  -1
+}
 echo(string(m))
 
 // Match reads the Option without a fallback value.
