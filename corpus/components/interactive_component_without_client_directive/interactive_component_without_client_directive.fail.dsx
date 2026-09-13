@@ -1,6 +1,6 @@
 fn clicked() {}
 
-fn Counter() Component {
+fn Counter() ReactNode {
   return <button onClick={clicked}>0</button>
 }
 
