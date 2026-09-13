@@ -1,2 +1,2 @@
-summon { missing(): Exception<number, string> } from "./foreign.mjs"
+summon { missing() Exception<number, string> } from "./foreign.mjs"
 const n = match missing() { Ok(v) => v, Throw(e) => 0 }

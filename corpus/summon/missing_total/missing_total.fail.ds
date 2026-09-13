@@ -1,1 +1,1 @@
-summon { number(): number } from "./foreign.mjs"
+summon { number() number } from "./foreign.mjs"

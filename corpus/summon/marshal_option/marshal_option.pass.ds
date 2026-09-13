@@ -1,4 +1,4 @@
-summon { total absent(): Option<number>, total missing(): Option<number>, total number(): Option<number>, total optional(v: Option<number>): number, total noop(): void } from "./foreign.mjs"
+summon { total absent() Option<number>, total missing() Option<number>, total number() Option<number>, total optional(v: Option<number>) number, total noop() void } from "./foreign.mjs"
 const a = match absent() { Some(v) => false, None => true }
 const b = match missing() { Some(v) => false, None => true }
 const c = match number() { Some(v) => v, None => 0 }

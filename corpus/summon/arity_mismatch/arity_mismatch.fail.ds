@@ -1,1 +1,1 @@
-summon { total read(): number } from "./foreign.mjs"
+summon { total read() number } from "./foreign.mjs"
