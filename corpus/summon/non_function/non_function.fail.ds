@@ -1,1 +1,1 @@
-summon { total scalar(): number } from "./foreign.mjs"
+summon { total scalar() number } from "./foreign.mjs"

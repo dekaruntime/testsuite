@@ -1,4 +1,4 @@
 opaque type Handle
-summon { total handle(): Handle, total read(h: Handle): number } from "./foreign.mjs"
+summon { total handle() Handle, total read(h: Handle) number } from "./foreign.mjs"
 opaque type Other
 const h: Other = handle()

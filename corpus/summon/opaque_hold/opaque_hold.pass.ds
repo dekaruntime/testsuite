@@ -1,5 +1,5 @@
 opaque type Handle
-summon { total handle(): Handle, total read(h: Handle): number } from "./foreign.mjs"
+summon { total handle() Handle, total read(h: Handle) number } from "./foreign.mjs"
 struct Stored { h: Handle }
 const held = Stored { h: handle() }
 if (read(held.h) != 42) { panic("handle identity"); }

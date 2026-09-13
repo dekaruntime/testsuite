@@ -1,1 +1,1 @@
-summon { total nonexistent(): number } from "./foreign.mjs"
+summon { total nonexistent() number } from "./foreign.mjs"
