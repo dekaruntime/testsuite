@@ -1,6 +1,5 @@
 {
-  "title": "Omitting an optional field in an object literal is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "expected argument type",
-  "notes": "deka#416: JSX fills omitted optionals; a bare object literal does not."
+  "title": "Omitting an optional field in an object literal produces None",
+  "stage": "run",
+  "notes": "dsc#180: Option erasure makes missing properties safe; retain the fixture ID for continuity."
 }
