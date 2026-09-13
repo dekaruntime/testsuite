@@ -1,6 +1,6 @@
 {
   "title": "A JSX element is not assignable to number",
   "stage": "parse",
-  "expectedDiagnosticContains": "found type `Component`",
+  "expectedDiagnosticContains": "found type `ReactNode`",
   "notes": "deka#461."
 }

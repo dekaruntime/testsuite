@@ -1,2 +1,2 @@
 const app = <Card />
-const Card = fn() Component { return <div>hi</div> }
+const Card = fn() ReactNode { return <div>hi</div> }
