@@ -4,7 +4,7 @@ import { echo } from "io"
 // not reach host globals). It is still reachable through `unsafe`, which is
 // the point of that block -- and the result is a `Result`, so the failure has
 // to be handled rather than assumed.
-let values = unsafe { Object.values({a: 1, b: 2}).join(",") }
+let values = unsafe<string> { Object.values({a: 1, b: 2}).join(",") }
 let joined = unwrap(values) or {
   "none"
 }

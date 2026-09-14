@@ -8,11 +8,11 @@ async fn value() Promise<number> {
 }
 
 async fn indirect() Promise<number> {
-  let resolved = unsafe { Promise.resolve(2) }
-  let pending = unwrap(resolved) or {
-    0
+  let resolved = unsafe<Promise<number>> { Promise.resolve(2) }
+  return match (resolved) {
+    Ok(pending) => await pending,
+    Err(_) => 0,
   }
-  return await pending
 }
 
 async fn main() {
