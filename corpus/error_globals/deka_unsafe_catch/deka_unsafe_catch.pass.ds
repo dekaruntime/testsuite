@@ -1,6 +1,6 @@
 import { echo } from "io"
-const x = unsafe { throw new Error("inner") }
-echo(match (x) {
+const x = unsafe<number> { throw new Error("inner") }
+echo(string(match (x) {
   Ok(v) => v,
   Err(_) => 99,
-})
+}))

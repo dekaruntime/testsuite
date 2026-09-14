@@ -7,7 +7,7 @@ echo(match (direct) {
   Ok(v) => v.name,
   Err(e) => "err",
 })
-const arrow = unsafe { () => User { name: "Bob" } }
+const arrow = unsafe<fn() User> { () => User { name: "Bob" } }
 const called = match (arrow) {
   Ok(v) => v(),
   Err(e) => User { name: "err" },
