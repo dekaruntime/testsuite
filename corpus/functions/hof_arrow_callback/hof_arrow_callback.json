@@ -1,0 +1,5 @@
+{
+  "title": "Arrow-function callback",
+  "stage": "run",
+  "notes": "rfd#67 (dsc#252): the callback's parameter type comes from `fn(number) number` (contextual typing, dsc#251)."
+}
