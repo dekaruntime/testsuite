@@ -1,0 +1,6 @@
+{
+  "title": "Arrow parameter without parens is rejected",
+  "stage": "parse",
+  "notes": "rfd#67 (dsc#252): arrow parameters always need parens; the diagnostic names the parenthesized form.",
+  "expectedDiagnosticContains": "arrow function parameters must be parenthesized: write `(x) =>` instead of `x =>`"
+}
