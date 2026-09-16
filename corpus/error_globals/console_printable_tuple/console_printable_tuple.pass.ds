@@ -1,1 +1,2 @@
-console.log([1, "two", true])
+const t: [number, string, boolean] = [1, "two", true]
+console.log(t)
