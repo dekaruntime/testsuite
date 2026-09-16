@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats a struct as Name { field: value, ... }",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: struct. Verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/struct/."
+}

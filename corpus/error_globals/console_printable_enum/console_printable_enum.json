@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats a payload enum case as Case(value), no enum-name prefix",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: enum. Verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/enum/."
+}

@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats a fixed-size mixed-type array",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: tuple. Verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/tuple/ -- its own note applies here too: DekaScript has no dedicated tuple syntax/runtime tag today, so this pins the array formatter on a heterogeneous literal instead."
+}
