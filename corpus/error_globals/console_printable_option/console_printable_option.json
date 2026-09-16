@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats Option.Some as Some(value) and Option.None as None",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: Option. The Some(7) line is verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/option/; the None line extends it per rfd#44's explicit ask to cover both variants, derived from crates/pool/src/wintertc.js inspect() (a payload-less enum case prints its bare case label -- value.__case with no `(...)`, same branch that formats a niladic user enum case)."
+}

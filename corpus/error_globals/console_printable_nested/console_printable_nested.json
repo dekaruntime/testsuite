@@ -1,0 +1,8 @@
+{
+  "title": "console.log recurses through Option<Array<struct>>",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: nested (Option wrapping an array of structs). Verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/nested/."
+}

@@ -1,0 +1,9 @@
+{
+  "title": "console.assert(false) writes \"Assertion failed: boom\" to stderr",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "expectedDiagnosticContains": "Assertion failed: boom",
+  "notes": "Renamed from console_assert_fail (rfd#44 made console a global, superseding RFD 32's console-is-gone world; deka#1116 crates/pool/src/wintertc.js assert()). console.assert does NOT throw on a falsy condition (WHATWG Console Standard) -- it writes 'Assertion failed: <message>' to stderr and returns; exit 0, stdout stays empty. The corpus runner (corpus/run.mjs) has no dedicated expected-stderr field: evaluate() only diffs stdout via expectedStdout/expectedStdoutNative. This repurposes expectedDiagnosticContains, which the runner also matches (as a substring, case-insensitive) against the captured raw stderr on a PASSING run, not only on compile failures -- see run.mjs's evaluate(), the `hay` array includes result.stderr unconditionally. That is a corpus limitation (a real expectedStderr field would be cleaner) worth filing separately; noted here rather than worked around silently."
+}

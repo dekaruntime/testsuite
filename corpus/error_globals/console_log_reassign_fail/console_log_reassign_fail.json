@@ -1,6 +1,6 @@
 {
-  "title": "Reassigning console.log fails",
-  "stage": "parse",
-  "expectedDiagnosticContains": "unknown identifier `console`",
-  "notes": "Global objects are frozen."
+  "title": "console cannot be bound, aliased, or reassigned",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "`console` is not a value; call its methods directly, e.g. `console.log(...)`",
+  "notes": "console is a global host surface per rfd#44 (superseding RFD 32's console-is-gone world), never a value -- same treatment as `deka`/`Math`. dsc#269 crates/deka_syntax/src/typeck/expr.rs check_expr_inner emits this exact diagnostic for any bare `console` reference with no binding, which is what both `console.log = 1` (assigning through the member access re-evaluates the `console` object expression) and a bare `const c = console` hit; dsc#269's console_tests.rs::console_is_not_a_value and ::console_field_torn_off_is_not_a_value cover the identifier form directly."
 }

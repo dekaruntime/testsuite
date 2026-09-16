@@ -1,0 +1,2 @@
+const r: Result<number, string> = Result.Err("boom")
+console.log(r)

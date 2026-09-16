@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats Result.Err as Err(value), quoting the nested string payload",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: Result. Not covered by a deka#1116 fixture under tests/dump/pending-console/; derived from crates/pool/src/wintertc.js inspect() -- Result shares the Option/enum `{ __enum, __case, ... }` shape, so Err(\"boom\") formats via the same case-label branch as console_printable_enum/option, and the payload recurses through inspect() rather than formatArgs()'s top-level pass, so the nested string is JSON-quoted (contrast console_printable_string, where a top-level string prints raw)."
+}

@@ -1,0 +1,9 @@
+{
+  "title": "console.error writes to stderr, not stdout",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "expectedDiagnosticContains": "something went wrong",
+  "notes": "WHATWG's warn/error stream split (crates/pool/src/wintertc.js: write(text, true)). Exit 0 -- console.error is not a failure. stdout must stay empty; see console_assert_false_stderr's note on repurposing expectedDiagnosticContains to assert a stderr substring, since the runner has no dedicated expected-stderr field."
+}

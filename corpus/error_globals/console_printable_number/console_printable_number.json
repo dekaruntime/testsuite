@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats a number with String()",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: number. Verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/number/."
+}

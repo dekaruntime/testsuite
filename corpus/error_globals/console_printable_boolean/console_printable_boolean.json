@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats a boolean with String()",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: boolean. Not covered by a deka#1116 fixture under tests/dump/pending-console/; derived directly from crates/pool/src/wintertc.js inspect() (t === \"boolean\" -> String(value)), same branch as number."
+}

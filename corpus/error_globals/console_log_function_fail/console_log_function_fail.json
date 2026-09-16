@@ -1,0 +1,6 @@
+{
+  "title": "console.log rejects a function value with a named diagnostic",
+  "stage": "typecheck",
+  "expectedDiagnosticContains": "console.log: value of type fn(number) number has no printable form",
+  "notes": "rfd#44's Printable predicate excludes function values; this is the exact wording the RFD gives as its own example. dsc#269 crates/deka_syntax/src/typeck/console_tests.rs::printable_rejects_a_function_value_with_named_diagnostic pins it, and ::printable_rejection_names_the_calling_method confirms every log-family method names itself the same way (console.warn:, console.table:, ...)."
+}

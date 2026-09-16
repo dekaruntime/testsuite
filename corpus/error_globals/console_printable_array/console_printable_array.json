@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats an array as [ item, item ]",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: array. Verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/array/."
+}
