@@ -1,6 +1,5 @@
 {
-  "title": "private escape",
-  "stage": "typecheck",
-  "notes": "rfd#39 core paired with dsc rfd39/summon-core; Option stays tagged pending dsc#98. Tier-2 analysis and summon CLI are deferred.",
-  "expectedDiagnosticContains": "cannot escape"
+  "title": "summoned name captured as a value",
+  "stage": "run",
+  "notes": "rfd#39 2026-09-16 declaration-files amendment removes the file-private summoned-name rule: a summoned binding is an ordinary value once declared, so capturing it (not just calling it directly) is no longer an error. Inverts the pre-amendment 'cannot escape' row."
 }
