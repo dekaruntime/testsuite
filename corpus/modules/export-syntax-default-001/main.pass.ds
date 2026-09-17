@@ -1,0 +1,7 @@
+import { echo } from "io"
+
+export default fn answer() number {
+  return 42
+}
+
+echo(string(answer()))
