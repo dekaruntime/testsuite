@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats Result.Ok",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: Result (Ok). The plain Result object prints as Ok(v) (rfd#44, formatting erased values)."
+}

@@ -1,0 +1,8 @@
+struct User {
+  name: string
+  nickname: Option<string>
+  age: Option<number>
+}
+
+const u = User { name: "sami", nickname: Option.None, age: Option.Some(40) }
+console.log(u)
