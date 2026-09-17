@@ -4,5 +4,5 @@
   "hosts": [
     "native"
   ],
-  "notes": "Printable category: Option. The Some(7) line is verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/option/; the None line extends it per rfd#44's explicit ask to cover both variants, derived from crates/pool/src/wintertc.js inspect() (a payload-less enum case prints its bare case label -- value.__case with no `(...)`, same branch that formats a niladic user enum case)."
+  "notes": "Printable category: Option. Option is erased (rfd#62): Some(v) prints as v, and undefined prints as None (rfd#44, formatting erased values)."
 }

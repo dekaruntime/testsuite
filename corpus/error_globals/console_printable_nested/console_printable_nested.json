@@ -4,5 +4,5 @@
   "hosts": [
     "native"
   ],
-  "notes": "Printable category: nested (Option wrapping an array of structs). Verbatim from deka#1116's own conformance fixture, tests/dump/pending-console/nested/."
+  "notes": "Printable category: nested. Some(...) is erased, so the array inside prints on its own (rfd#44, formatting erased values)."
 }

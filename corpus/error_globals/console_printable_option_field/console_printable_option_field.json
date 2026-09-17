@@ -1,0 +1,8 @@
+{
+  "title": "console.log formats a struct with Option fields",
+  "stage": "run",
+  "hosts": [
+    "native"
+  ],
+  "notes": "Printable category: Option inside a struct. None prints as None and Some(v) as v, field by field (rfd#44, formatting erased values)."
+}
