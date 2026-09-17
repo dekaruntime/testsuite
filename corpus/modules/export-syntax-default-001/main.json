@@ -1,5 +1,5 @@
 {
-  "title": "export default is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "Unsupported export syntax"
+  "title": "export default is accepted",
+  "stage": "run",
+  "notes": "rfd#12 ESM alignment amendment (2026-09-16, dsc#280): default exports are now allowed. Inverted from the old ban this fixture pinned (dsc issue #280)."
 }

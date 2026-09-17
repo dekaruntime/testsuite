@@ -1,6 +1,5 @@
 {
-  "title": "import without braces is rejected",
-  "stage": "parse",
-  "expectedDiagnosticContains": "expected ``{``, found `identifier`",
-  "notes": "deka#567: the rejection now comes from the real parser naming the entry file, not from the resolution gate's downstream 'Missing export' artifact."
+  "title": "import without braces is accepted",
+  "stage": "run",
+  "notes": "rfd#12 ESM alignment amendment (2026-09-16, dsc#280): `import X from \"…\"` is now the default-import sugar, resolving to the module's default export. Inverted from the old ban this fixture pinned (deka#567's parser-naming fixture is retired along with the ban)."
 }
