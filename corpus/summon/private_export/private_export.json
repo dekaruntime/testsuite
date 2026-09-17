@@ -1,6 +1,5 @@
 {
-  "title": "private export",
-  "stage": "typecheck",
-  "notes": "rfd#39 core paired with dsc rfd39/summon-core; Option stays tagged pending dsc#98. Tier-2 analysis and summon CLI are deferred.",
-  "expectedDiagnosticContains": "file-private"
+  "title": "summoned name exported",
+  "stage": "run",
+  "notes": "rfd#39 2026-09-16 declaration-files amendment removes the file-private summoned-name rule: a summoned binding exports and re-exports like any other name, since every crossing still carries its declared type and failure channel. Inverts the pre-amendment 'file-private' row."
 }
